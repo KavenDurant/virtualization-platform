@@ -136,7 +136,7 @@ const MainLayout: React.FC = () => {
         breadcrumbItems.push({
           title:
             index === pathParts.length - 1 ? (
-              menuMap[currentPath]
+              <span>{menuMap[currentPath]}</span>
             ) : (
               <span onClick={() => navigate(currentPath)} style={{ cursor: 'pointer' }}>
                 {menuMap[currentPath]}
@@ -148,7 +148,7 @@ const MainLayout: React.FC = () => {
         // 未知路径，添加格式化的标题
         const formattedTitle = part.charAt(0).toUpperCase() + part.slice(1).replace(/-/g, ' ');
         breadcrumbItems.push({
-          title: formattedTitle,
+          title: <span>{formattedTitle}</span>,
           key: part,
         });
       }

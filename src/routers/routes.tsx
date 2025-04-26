@@ -1,4 +1,4 @@
-import React, { lazy } from 'react';
+import { lazy } from 'react';
 import { Navigate, RouteObject } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
 import LazyLoad from '@/components/LazyLoad';
