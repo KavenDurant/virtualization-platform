@@ -77,7 +77,9 @@ export const getStoragePool = async (id: string): Promise<StoragePool | null> =>
 };
 
 // 创建存储池
-export const createStoragePool = async (params: CreateStoragePoolParams): Promise<StoragePool | null> => {
+export const createStoragePool = async (
+  params: CreateStoragePoolParams
+): Promise<StoragePool | null> => {
   try {
     const response = await http.post<StoragePool>('/storage/pools', params);
     message.success('创建存储池成功');
@@ -165,7 +167,9 @@ export const getStorageVolume = async (id: string): Promise<StorageVolume | null
 };
 
 // 创建存储卷
-export const createStorageVolume = async (params: CreateStorageVolumeParams): Promise<StorageVolume | null> => {
+export const createStorageVolume = async (
+  params: CreateStorageVolumeParams
+): Promise<StorageVolume | null> => {
   try {
     const response = await http.post<StorageVolume>('/storage/volumes', params);
     message.success('创建存储卷成功');
@@ -191,7 +195,11 @@ export const deleteStorageVolume = async (id: string): Promise<boolean> => {
 };
 
 // 挂载存储卷到虚拟机
-export const attachVolumeToVM = async (volumeId: string, vmId: string, device?: string): Promise<boolean> => {
+export const attachVolumeToVM = async (
+  volumeId: string,
+  vmId: string,
+  device?: string
+): Promise<boolean> => {
   try {
     await http.post(`/storage/volumes/${volumeId}/attach`, { vmId, device });
     message.success('挂载存储卷成功');
@@ -238,7 +246,10 @@ export interface UploadImageParams {
   description?: string;
 }
 
-export const uploadImage = async (params: UploadImageParams, onProgress?: (percent: number) => void): Promise<StorageVolume | null> => {
+export const uploadImage = async (
+  params: UploadImageParams,
+  onProgress?: (percent: number) => void
+): Promise<StorageVolume | null> => {
   try {
     const formData = new FormData();
     formData.append('poolId', params.poolId);
@@ -248,17 +259,21 @@ export const uploadImage = async (params: UploadImageParams, onProgress?: (perce
     if (params.description) {
       formData.append('description', params.description);
     }
-    
+
     const response = await http.post<StorageVolume>('/storage/images/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      onUploadProgress: onProgress ? (progressEvent) => {
-        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
-        onProgress(percentCompleted);
-      } : undefined,
+      onUploadProgress: onProgress
+        ? progressEvent => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total!
+            );
+            onProgress(percentCompleted);
+          }
+        : undefined,
     });
-    
+
     message.success('上传镜像成功');
     return response;
   } catch (error) {

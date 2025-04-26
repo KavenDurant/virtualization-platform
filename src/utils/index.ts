@@ -7,16 +7,19 @@
  * @param date 日期对象或时间戳
  * @param format 格式化模式，默认为 'YYYY-MM-DD HH:mm:ss'
  */
-export const formatDateTime = (date: Date | number | string, format = 'YYYY-MM-DD HH:mm:ss'): string => {
+export const formatDateTime = (
+  date: Date | number | string,
+  format = 'YYYY-MM-DD HH:mm:ss'
+): string => {
   const d = new Date(date);
-  
+
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   const hours = String(d.getHours()).padStart(2, '0');
   const minutes = String(d.getMinutes()).padStart(2, '0');
   const seconds = String(d.getSeconds()).padStart(2, '0');
-  
+
   return format
     .replace(/YYYY/g, String(year))
     .replace(/MM/g, month)
@@ -33,11 +36,11 @@ export const formatDateTime = (date: Date | number | string, format = 'YYYY-MM-D
  */
 export const formatFileSize = (bytes: number, decimals = 2): string => {
   if (bytes === 0) return '0 Bytes';
-  
+
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i];
 };
 
@@ -45,9 +48,9 @@ export const formatFileSize = (bytes: number, decimals = 2): string => {
  * 生成UUID
  */
 export const generateUUID = (): string => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 };

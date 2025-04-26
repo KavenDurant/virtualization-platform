@@ -1,13 +1,26 @@
 import React, { useState } from 'react';
-import { Table, Card, Button, Space, Tag, Modal, Form, Input, Select, InputNumber, Tabs, Badge } from 'antd';
-import { 
-  PlusOutlined, 
-  ReloadOutlined, 
-  PlayCircleOutlined, 
-  PauseCircleOutlined, 
-  PoweroffOutlined, 
+import {
+  Table,
+  Card,
+  Button,
+  Space,
+  Tag,
+  Modal,
+  Form,
+  Input,
+  Select,
+  InputNumber,
+  Tabs,
+  Badge,
+} from 'antd';
+import {
+  PlusOutlined,
+  ReloadOutlined,
+  PlayCircleOutlined,
+  PauseCircleOutlined,
+  PoweroffOutlined,
   DeleteOutlined,
-  EditOutlined
+  EditOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { TabsProps } from 'antd';
@@ -369,7 +382,8 @@ const VirtualMachines: React.FC = () => {
   };
 
   const handleOk = () => {
-    form.validateFields()
+    form
+      .validateFields()
       .then(values => {
         console.log('表单提交:', values);
         form.resetFields();
@@ -393,7 +407,7 @@ const VirtualMachines: React.FC = () => {
   const renderStatusTag = (status: string) => {
     let color = 'green';
     let text = '运行中';
-    
+
     if (status === 'stopped') {
       color = 'default';
       text = '已停止';
@@ -404,7 +418,7 @@ const VirtualMachines: React.FC = () => {
       color = 'red';
       text = '错误';
     }
-    
+
     return <Tag color={color}>{text}</Tag>;
   };
 
@@ -419,7 +433,7 @@ const VirtualMachines: React.FC = () => {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => renderStatusTag(status),
+      render: status => renderStatusTag(status),
       filters: [
         { text: '运行中', value: 'running' },
         { text: '已停止', value: 'stopped' },
@@ -437,14 +451,14 @@ const VirtualMachines: React.FC = () => {
       title: 'CPU',
       dataIndex: 'cpu',
       key: 'cpu',
-      render: (cpu) => `${cpu} 核`,
+      render: cpu => `${cpu} 核`,
       sorter: (a, b) => a.cpu - b.cpu,
     },
     {
       title: '内存',
       dataIndex: 'memory',
       key: 'memory',
-      render: (memory) => `${memory} GB`,
+      render: memory => `${memory} GB`,
       sorter: (a, b) => a.memory - b.memory,
     },
     {
@@ -458,47 +472,47 @@ const VirtualMachines: React.FC = () => {
       render: (_, record) => (
         <Space size="small">
           {record.status === 'stopped' && (
-            <Button 
-              type="text" 
-              icon={<PlayCircleOutlined />} 
+            <Button
+              type="text"
+              icon={<PlayCircleOutlined />}
               onClick={() => handleAction('启动', record)}
               title="启动"
             />
           )}
           {record.status === 'running' && (
             <>
-              <Button 
-                type="text" 
-                icon={<PauseCircleOutlined />} 
+              <Button
+                type="text"
+                icon={<PauseCircleOutlined />}
                 onClick={() => handleAction('暂停', record)}
                 title="暂停"
               />
-              <Button 
-                type="text" 
-                icon={<PoweroffOutlined />} 
+              <Button
+                type="text"
+                icon={<PoweroffOutlined />}
                 onClick={() => handleAction('停止', record)}
                 title="停止"
               />
             </>
           )}
           {record.status === 'paused' && (
-            <Button 
-              type="text" 
-              icon={<PlayCircleOutlined />} 
+            <Button
+              type="text"
+              icon={<PlayCircleOutlined />}
               onClick={() => handleAction('恢复', record)}
               title="恢复"
             />
           )}
-          <Button 
-            type="text" 
-            icon={<EditOutlined />} 
+          <Button
+            type="text"
+            icon={<EditOutlined />}
             onClick={() => handleAction('编辑', record)}
             title="编辑"
           />
-          <Button 
-            type="text" 
-            danger 
-            icon={<DeleteOutlined />} 
+          <Button
+            type="text"
+            danger
+            icon={<DeleteOutlined />}
             onClick={() => handleAction('删除', record)}
             title="删除"
           />
@@ -528,36 +542,31 @@ const VirtualMachines: React.FC = () => {
               <Button icon={<ReloadOutlined />}>刷新</Button>
             </Space>
           </div>
-          
-          <Table 
-            columns={columns} 
-            dataSource={data} 
-            rowKey="id"
-            pagination={{ pageSize: 10 }}
-          />
+
+          <Table columns={columns} dataSource={data} rowKey="id" pagination={{ pageSize: 10 }} />
         </>
       ),
     },
     {
       key: '2',
       label: '我的虚拟机',
-      children: '我的虚拟机内容'
+      children: '我的虚拟机内容',
     },
     {
       key: '3',
       label: '模板',
-      children: '虚拟机模板内容'
-    }
+      children: '虚拟机模板内容',
+    },
   ];
 
   return (
     <div className="virtual-machines-container">
       <h1>虚拟机管理</h1>
-      
+
       <Card>
         <Tabs defaultActiveKey="1" items={tabItems} />
       </Card>
-      
+
       {/* 创建虚拟机表单 */}
       <Modal
         title="创建虚拟机"
@@ -570,11 +579,11 @@ const VirtualMachines: React.FC = () => {
           form={form}
           layout="vertical"
           name="createVirtualMachineForm"
-          initialValues={{ 
-            os: 'CentOS 8', 
-            cpu: 2, 
-            memory: 4, 
-            storage: 50 
+          initialValues={{
+            os: 'CentOS 8',
+            cpu: 2,
+            memory: 4,
+            storage: 50,
           }}
         >
           <Form.Item
@@ -584,7 +593,7 @@ const VirtualMachines: React.FC = () => {
           >
             <Input placeholder="请输入虚拟机名称" />
           </Form.Item>
-          
+
           <Form.Item
             name="os"
             label="操作系统"
@@ -597,7 +606,7 @@ const VirtualMachines: React.FC = () => {
               <Option value="Windows Server 2019">Windows Server 2019</Option>
             </Select>
           </Form.Item>
-          
+
           <Form.Item
             name="cpu"
             label="CPU核心数"
@@ -605,7 +614,7 @@ const VirtualMachines: React.FC = () => {
           >
             <InputNumber min={1} max={32} style={{ width: '100%' }} />
           </Form.Item>
-          
+
           <Form.Item
             name="memory"
             label="内存大小(GB)"
@@ -613,7 +622,7 @@ const VirtualMachines: React.FC = () => {
           >
             <InputNumber min={1} max={128} style={{ width: '100%' }} />
           </Form.Item>
-          
+
           <Form.Item
             name="storage"
             label="存储容量(GB)"
@@ -621,7 +630,7 @@ const VirtualMachines: React.FC = () => {
           >
             <InputNumber min={10} max={1000} style={{ width: '100%' }} />
           </Form.Item>
-          
+
           <Form.Item
             name="network"
             label="网络设置"
@@ -633,11 +642,8 @@ const VirtualMachines: React.FC = () => {
               <Option value="custom">自定义</Option>
             </Select>
           </Form.Item>
-          
-          <Form.Item
-            name="description"
-            label="描述"
-          >
+
+          <Form.Item name="description" label="描述">
             <Input.TextArea rows={4} placeholder="请输入虚拟机描述" />
           </Form.Item>
         </Form>

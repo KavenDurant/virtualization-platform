@@ -1,6 +1,7 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy } from 'react';
 import { Navigate, RouteObject } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
+import LazyLoad from '@/components/LazyLoad';
 
 // 懒加载页面组件
 const Dashboard = lazy(() => import('@/pages/dashboard'));
@@ -11,15 +12,6 @@ const UserManagement = lazy(() => import('@/pages/users'));
 const Settings = lazy(() => import('@/pages/settings'));
 const Login = lazy(() => import('@/pages/login'));
 const NotFound = lazy(() => import('@/pages/404'));
-
-// 路由加载组件
-const LazyLoad = (Component: React.LazyExoticComponent<React.ComponentType<any>>) => {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Component />
-    </Suspense>
-  );
-};
 
 // 路由配置
 const routes: RouteObject[] = [

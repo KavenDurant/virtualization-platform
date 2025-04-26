@@ -4,10 +4,17 @@ import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import './index.less';
 
+interface LoginFormValues {
+  username: string;
+  password: string;
+  captcha: string;
+  remember: boolean;
+}
+
 const Login: React.FC = () => {
   const navigate = useNavigate();
 
-  const onFinish = (values: any) => {
+  const onFinish = (values: LoginFormValues) => {
     console.log('登录表单提交:', values);
     // 这里应该添加实际的登录API调用
     // 模拟登录成功
@@ -23,28 +30,18 @@ const Login: React.FC = () => {
           <h1>虚拟化平台</h1>
           <p>符合国保测标准的企业级虚拟化管理系统</p>
         </div>
-        
+
         <Form
           name="login_form"
           className="login-form"
           initialValues={{ remember: true }}
           onFinish={onFinish}
         >
-          <Form.Item
-            name="username"
-            rules={[{ required: true, message: '请输入用户名!' }]}
-          >
-            <Input 
-              prefix={<UserOutlined />} 
-              placeholder="用户名" 
-              size="large" 
-            />
+          <Form.Item name="username" rules={[{ required: true, message: '请输入用户名!' }]}>
+            <Input prefix={<UserOutlined />} placeholder="用户名" size="large" />
           </Form.Item>
-          
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: '请输入密码!' }]}
-          >
+
+          <Form.Item name="password" rules={[{ required: true, message: '请输入密码!' }]}>
             <Input.Password
               prefix={<LockOutlined />}
               type="password"
@@ -52,24 +49,17 @@ const Login: React.FC = () => {
               size="large"
             />
           </Form.Item>
-          
-          <Form.Item
-            name="captcha"
-            rules={[{ required: true, message: '请输入验证码!' }]}
-          >
+
+          <Form.Item name="captcha" rules={[{ required: true, message: '请输入验证码!' }]}>
             <div className="captcha-container">
-              <Input
-                prefix={<SafetyOutlined />}
-                placeholder="验证码"
-                size="large"
-              />
+              <Input prefix={<SafetyOutlined />} placeholder="验证码" size="large" />
               <div className="captcha-image">
                 {/* 验证码图片区域 */}
                 <div className="mock-captcha">1234</div>
               </div>
             </div>
           </Form.Item>
-          
+
           <Form.Item>
             <Form.Item name="remember" valuePropName="checked" noStyle>
               <Checkbox>记住我</Checkbox>
@@ -84,7 +74,7 @@ const Login: React.FC = () => {
               登录
             </Button>
           </Form.Item>
-          
+
           <div className="login-footer">
             <p>Copyright © {new Date().getFullYear()} 虚拟化平台</p>
           </div>

@@ -59,26 +59,26 @@ export const getBatchVMPerformance = async (vmIds: string[]): Promise<VMPerforma
 
 // 获取虚拟机历史性能数据
 export const getVMHistoricalPerformance = async (
-  vmId: string, 
-  startTime: number, 
-  endTime: number, 
+  vmId: string,
+  startTime: number,
+  endTime: number,
   interval: string = '5m'
 ): Promise<VMPerformanceData[]> => {
   try {
     const response = await http.get<VMPerformanceData[]>(`/vm/${vmId}/historical-performance`, {
-      params: { startTime, endTime, interval }
+      params: { startTime, endTime, interval },
     });
     return response;
   } catch (error) {
     console.error('获取虚拟机历史性能数据失败:', error);
     message.error('获取虚拟机历史性能数据失败');
-    
+
     // 返回模拟数据以防接口失败
     const data: VMPerformanceData[] = [];
     const points = 20; // 生成20个数据点
     const timeSpan = endTime - startTime;
     const step = timeSpan / points;
-    
+
     for (let i = 0; i < points; i++) {
       data.push({
         vmId,
@@ -91,7 +91,7 @@ export const getVMHistoricalPerformance = async (
         timestamp: startTime + i * step,
       });
     }
-    
+
     return data;
   }
 };
@@ -125,7 +125,7 @@ export const getVMAlertThreshold = async (vmId: string): Promise<VMAlertThreshol
   } catch (error) {
     console.error('获取虚拟机警报阈值失败:', error);
     message.error('获取警报阈值失败');
-    
+
     // 返回默认阈值
     return {
       vmId,

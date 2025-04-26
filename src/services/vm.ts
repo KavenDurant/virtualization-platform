@@ -52,7 +52,9 @@ export const getVirtualMachine = async (id: string): Promise<VirtualMachine | nu
 };
 
 // 创建虚拟机
-export const createVirtualMachine = async (params: CreateVMParams): Promise<VirtualMachine | null> => {
+export const createVirtualMachine = async (
+  params: CreateVMParams
+): Promise<VirtualMachine | null> => {
   try {
     const response = await http.post<VirtualMachine>('/vm', params);
     message.success('创建虚拟机成功');
@@ -150,7 +152,9 @@ export interface UpdateVMConfigParams {
   description?: string;
 }
 
-export const updateVirtualMachineConfig = async (params: UpdateVMConfigParams): Promise<boolean> => {
+export const updateVirtualMachineConfig = async (
+  params: UpdateVMConfigParams
+): Promise<boolean> => {
   try {
     await http.put(`/vm/${params.id}/config`, params);
     message.success('更新虚拟机配置成功');
@@ -163,7 +167,11 @@ export const updateVirtualMachineConfig = async (params: UpdateVMConfigParams): 
 };
 
 // 创建虚拟机快照
-export const createVirtualMachineSnapshot = async (id: string, name: string, description?: string): Promise<boolean> => {
+export const createVirtualMachineSnapshot = async (
+  id: string,
+  name: string,
+  description?: string
+): Promise<boolean> => {
   try {
     await http.post(`/vm/${id}/snapshot`, { name, description });
     message.success('创建快照成功');
@@ -197,7 +205,10 @@ export const getVirtualMachineSnapshots = async (vmId: string): Promise<VMSnapsh
 };
 
 // 恢复虚拟机快照
-export const restoreVirtualMachineSnapshot = async (vmId: string, snapshotId: string): Promise<boolean> => {
+export const restoreVirtualMachineSnapshot = async (
+  vmId: string,
+  snapshotId: string
+): Promise<boolean> => {
   try {
     await http.post(`/vm/${vmId}/snapshot/${snapshotId}/restore`);
     message.success('恢复快照成功');
@@ -210,7 +221,10 @@ export const restoreVirtualMachineSnapshot = async (vmId: string, snapshotId: st
 };
 
 // 删除虚拟机快照
-export const deleteVirtualMachineSnapshot = async (vmId: string, snapshotId: string): Promise<boolean> => {
+export const deleteVirtualMachineSnapshot = async (
+  vmId: string,
+  snapshotId: string
+): Promise<boolean> => {
   try {
     await http.delete(`/vm/${vmId}/snapshot/${snapshotId}`);
     message.success('删除快照成功');

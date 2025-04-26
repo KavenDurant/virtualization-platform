@@ -183,7 +183,9 @@ export const getVMNetworkInterfaces = async (vmId: string): Promise<NetworkInter
 };
 
 // 创建网卡
-export const createNetworkInterface = async (params: CreateNetworkInterfaceParams): Promise<NetworkInterface | null> => {
+export const createNetworkInterface = async (
+  params: CreateNetworkInterfaceParams
+): Promise<NetworkInterface | null> => {
   try {
     const response = await http.post<NetworkInterface>('/network/interfaces', params);
     message.success('创建网卡成功');
@@ -243,7 +245,9 @@ export interface UpdateNetworkInterfaceParams {
 }
 
 // 更新网卡
-export const updateNetworkInterface = async (params: UpdateNetworkInterfaceParams): Promise<boolean> => {
+export const updateNetworkInterface = async (
+  params: UpdateNetworkInterfaceParams
+): Promise<boolean> => {
   try {
     await http.put(`/network/interfaces/${params.id}`, params);
     message.success('更新网卡成功');

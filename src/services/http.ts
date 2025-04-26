@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosRequestConfig, AxiosError } from 'axios';
 import { message } from 'antd';
 
 // 创建axios实例
@@ -12,20 +12,20 @@ const instance = axios.create({
 
 // 请求拦截器
 instance.interceptors.request.use(
-  (config) => {
+  config => {
     // 从本地存储中获取token
     const token = localStorage.getItem('token');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     // 添加国保测相关的安全头部信息
     config.headers['X-Security-Token'] = generateSecurityToken();
     config.headers['X-Request-ID'] = generateRequestId();
-    
+
     return config;
   },
-  (error) => {
+  error => {
     console.error('请求错误:', error);
     return Promise.reject(error);
   }
@@ -33,20 +33,20 @@ instance.interceptors.request.use(
 
 // 响应拦截器
 instance.interceptors.response.use(
-  (response) => {
+  response => {
     // 验证响应数据的完整性和安全性
-    if (!validateResponseSecurity(response)) {
+    if (!validateResponseSecurity()) {
       return Promise.reject(new Error('响应数据安全校验失败'));
     }
-    
+
     return response.data;
   },
   (error: AxiosError) => {
     let errorMessage = '服务器错误，请稍后重试';
-    
+
     if (error.response) {
       const status = error.response.status;
-      
+
       // 根据状态码处理不同的错误情况
       switch (status) {
         case 400:
@@ -72,13 +72,13 @@ instance.interceptors.response.use(
     } else if (error.request) {
       errorMessage = '无法连接到服务器，请检查网络';
     }
-    
+
     // 显示错误提示
     message.error(errorMessage);
-    
+
     // 记录错误日志（可对接到日志系统）
     console.error('API请求错误:', error);
-    
+
     return Promise.reject(error);
   }
 );
@@ -95,30 +95,42 @@ function generateRequestId(): string {
 }
 
 // 验证响应安全性（模拟）
-function validateResponseSecurity(response: AxiosResponse): boolean {
+function validateResponseSecurity(): boolean {
   // 在实际项目中，应该检查响应的完整性和真实性
   // 例如，校验签名、检查时间戳等
   return true;
 }
 
 // 封装GET请求
-export function get<T>(url: string, params?: any, config?: AxiosRequestConfig): Promise<T> {
+export function get<T>(
+  url: string,
+  params?: Record<string, unknown>,
+  config?: AxiosRequestConfig
+): Promise<T> {
   return instance.get(url, { params, ...config });
 }
 
 // 封装POST请求
-export function post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-  return instance.post(url, data, config);
+export function post<T>(
+  url: string,
+  data?: Record<string, unknown>,
+  config?: AxiosRequestConfig
+): Promise<T> {
+  return instance.post<Record<string, unknown>, T>(url, data, config);
 }
 
 // 封装PUT请求
-export function put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-  return instance.put(url, data, config);
+export function put<T>(
+  url: string,
+  data?: Record<string, unknown>,
+  config?: AxiosRequestConfig
+): Promise<T> {
+  return instance.put<Record<string, unknown>, T>(url, data, config);
 }
 
 // 封装DELETE请求
 export function del<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-  return instance.delete(url, config);
+  return instance.delete<Record<string, unknown>, T>(url, config);
 }
 
 // 导出API服务

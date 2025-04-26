@@ -1,17 +1,32 @@
 import React, { useState } from 'react';
-import { Table, Card, Button, Space, Tag, Progress, Modal, Form, Input, InputNumber, Select, Tabs, Badge, Typography, Tooltip } from 'antd';
-import { 
-  PlusOutlined, 
-  ReloadOutlined, 
+import {
+  Table,
+  Card,
+  Button,
+  Space,
+  Tag,
+  Progress,
+  Modal,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Tabs,
+  Badge,
+  Typography,
+  Tooltip,
+} from 'antd';
+import {
+  PlusOutlined,
+  ReloadOutlined,
   DeleteOutlined,
   EditOutlined,
   HddOutlined,
   InboxOutlined,
   CloudUploadOutlined,
-  QuestionCircleOutlined
+  QuestionCircleOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import type { TabsProps } from 'antd';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -141,7 +156,8 @@ const Storage: React.FC = () => {
 
   // 处理创建存储池
   const handlePoolOk = () => {
-    poolForm.validateFields()
+    poolForm
+      .validateFields()
       .then(values => {
         console.log('表单提交-存储池:', values);
         poolForm.resetFields();
@@ -165,7 +181,8 @@ const Storage: React.FC = () => {
 
   // 处理创建存储卷
   const handleVolumeOk = () => {
-    volumeForm.validateFields()
+    volumeForm
+      .validateFields()
       .then(values => {
         console.log('表单提交-存储卷:', values);
         volumeForm.resetFields();
@@ -183,7 +200,11 @@ const Storage: React.FC = () => {
   };
 
   // 处理操作
-  const handleAction = (action: string, type: 'pool' | 'volume', record: any) => {
+  const handleAction = (
+    action: string,
+    type: 'pool' | 'volume',
+    record: StoragePool | StorageVolume
+  ) => {
     console.log(`执行操作: ${action}，类型: ${type}，名称: ${record.name}`);
     // 在实际应用中，这里应该调用API来执行相应的操作
   };
@@ -192,7 +213,7 @@ const Storage: React.FC = () => {
   const renderPoolStatusTag = (status: string) => {
     let color = 'green';
     let text = '活跃';
-    
+
     if (status === 'inactive') {
       color = 'orange';
       text = '未激活';
@@ -200,7 +221,7 @@ const Storage: React.FC = () => {
       color = 'red';
       text = '错误';
     }
-    
+
     return <Tag color={color}>{text}</Tag>;
   };
 
@@ -208,7 +229,7 @@ const Storage: React.FC = () => {
   const renderVolumeStatusTag = (status: string) => {
     let color = 'green';
     let text = '可用';
-    
+
     if (status === 'in-use') {
       color = 'blue';
       text = '使用中';
@@ -216,7 +237,7 @@ const Storage: React.FC = () => {
       color = 'red';
       text = '错误';
     }
-    
+
     return <Tag color={color}>{text}</Tag>;
   };
 
@@ -232,12 +253,12 @@ const Storage: React.FC = () => {
       title: '类型',
       dataIndex: 'type',
       key: 'type',
-      render: (type) => {
+      render: type => {
         const typeMap: Record<string, string> = {
-          'local': '本地存储',
-          'iscsi': 'iSCSI',
-          'nfs': 'NFS',
-          'ceph': 'Ceph',
+          local: '本地存储',
+          iscsi: 'iSCSI',
+          nfs: 'NFS',
+          ceph: 'Ceph',
         };
         return typeMap[type] || type;
       },
@@ -253,7 +274,7 @@ const Storage: React.FC = () => {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => renderPoolStatusTag(status),
+      render: status => renderPoolStatusTag(status),
       filters: [
         { text: '活跃', value: 'active' },
         { text: '未激活', value: 'inactive' },
@@ -268,16 +289,18 @@ const Storage: React.FC = () => {
         const usagePercentage = Math.round((record.usedCapacity / record.totalCapacity) * 100);
         return (
           <div>
-            <Progress 
-              percent={usagePercentage} 
-              size="small" 
+            <Progress
+              percent={usagePercentage}
+              size="small"
               status={usagePercentage > 80 ? 'exception' : undefined}
             />
-            <div>{record.usedCapacity} GB / {record.totalCapacity} GB</div>
+            <div>
+              {record.usedCapacity} GB / {record.totalCapacity} GB
+            </div>
           </div>
         );
       },
-      sorter: (a, b) => (a.usedCapacity / a.totalCapacity) - (b.usedCapacity / b.totalCapacity),
+      sorter: (a, b) => a.usedCapacity / a.totalCapacity - b.usedCapacity / b.totalCapacity,
     },
     {
       title: '路径/目标',
@@ -290,15 +313,15 @@ const Storage: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="small">
-          <Button 
-            type="text" 
-            icon={<EditOutlined />} 
+          <Button
+            type="text"
+            icon={<EditOutlined />}
             onClick={() => handleAction('编辑', 'pool', record)}
             title="编辑"
           />
           {record.status !== 'active' ? (
-            <Button 
-              type="text" 
+            <Button
+              type="text"
               style={{ color: 'green' }}
               onClick={() => handleAction('激活', 'pool', record)}
               title="激活"
@@ -306,8 +329,8 @@ const Storage: React.FC = () => {
               激活
             </Button>
           ) : (
-            <Button 
-              type="text" 
+            <Button
+              type="text"
               style={{ color: 'orange' }}
               onClick={() => handleAction('停用', 'pool', record)}
               title="停用"
@@ -315,10 +338,10 @@ const Storage: React.FC = () => {
               停用
             </Button>
           )}
-          <Button 
-            type="text" 
-            danger 
-            icon={<DeleteOutlined />} 
+          <Button
+            type="text"
+            danger
+            icon={<DeleteOutlined />}
             onClick={() => handleAction('删除', 'pool', record)}
             title="删除"
           />
@@ -346,7 +369,7 @@ const Storage: React.FC = () => {
       title: '大小',
       dataIndex: 'size',
       key: 'size',
-      render: (size) => `${size} GB`,
+      render: size => `${size} GB`,
       sorter: (a, b) => a.size - b.size,
     },
     {
@@ -364,7 +387,7 @@ const Storage: React.FC = () => {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => renderVolumeStatusTag(status),
+      render: status => renderVolumeStatusTag(status),
       filters: [
         { text: '可用', value: 'available' },
         { text: '使用中', value: 'in-use' },
@@ -376,7 +399,7 @@ const Storage: React.FC = () => {
       title: '挂载到',
       dataIndex: 'attachedTo',
       key: 'attachedTo',
-      render: (attachedTo) => attachedTo || '-',
+      render: attachedTo => attachedTo || '-',
     },
     {
       title: '操作',
@@ -384,8 +407,8 @@ const Storage: React.FC = () => {
       render: (_, record) => (
         <Space size="small">
           {record.status === 'available' && (
-            <Button 
-              type="text" 
+            <Button
+              type="text"
               style={{ color: 'blue' }}
               onClick={() => handleAction('挂载', 'volume', record)}
               title="挂载"
@@ -394,8 +417,8 @@ const Storage: React.FC = () => {
             </Button>
           )}
           {record.status === 'in-use' && (
-            <Button 
-              type="text" 
+            <Button
+              type="text"
               style={{ color: 'orange' }}
               onClick={() => handleAction('卸载', 'volume', record)}
               title="卸载"
@@ -403,17 +426,17 @@ const Storage: React.FC = () => {
               卸载
             </Button>
           )}
-          <Button 
-            type="text" 
-            icon={<EditOutlined />} 
+          <Button
+            type="text"
+            icon={<EditOutlined />}
             onClick={() => handleAction('编辑', 'volume', record)}
             title="编辑"
             disabled={record.status === 'in-use'}
           />
-          <Button 
-            type="text" 
-            danger 
-            icon={<DeleteOutlined />} 
+          <Button
+            type="text"
+            danger
+            icon={<DeleteOutlined />}
             onClick={() => handleAction('删除', 'volume', record)}
             title="删除"
             disabled={record.status === 'in-use'}
@@ -428,7 +451,7 @@ const Storage: React.FC = () => {
     const totalCapacity = poolData.reduce((sum, pool) => sum + pool.totalCapacity, 0);
     const usedCapacity = poolData.reduce((sum, pool) => sum + pool.usedCapacity, 0);
     const usagePercentage = Math.round((usedCapacity / totalCapacity) * 100);
-    
+
     return (
       <Card style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -454,75 +477,78 @@ const Storage: React.FC = () => {
   return (
     <div className="storage-container">
       <h1>存储管理</h1>
-      
+
       {renderStoragePoolOverview()}
-      
+
       <Card>
-        <Tabs defaultActiveKey="1" items={[
-          {
-            key: '1',
-            label: (
-              <span>
-                <HddOutlined />
-                <Badge count={poolData.length} offset={[10, 0]}>
-                  存储池
-                </Badge>
-              </span>
-            ),
-            children: (
-              <>
-                <div className="table-operations">
-                  <Space style={{ marginBottom: 16 }}>
-                    <Button type="primary" icon={<PlusOutlined />} onClick={showPoolModal}>
-                      创建存储池
-                    </Button>
-                    <Button icon={<ReloadOutlined />}>刷新</Button>
-                  </Space>
-                </div>
-                
-                <Table 
-                  columns={poolColumns} 
-                  dataSource={poolData} 
-                  rowKey="id"
-                  pagination={{ pageSize: 10 }}
-                />
-              </>
-            )
-          },
-          {
-            key: '2',
-            label: (
-              <span>
-                <InboxOutlined />
-                <Badge count={volumeData.length} offset={[10, 0]}>
-                  存储卷
-                </Badge>
-              </span>
-            ),
-            children: (
-              <>
-                <div className="table-operations">
-                  <Space style={{ marginBottom: 16 }}>
-                    <Button type="primary" icon={<PlusOutlined />} onClick={showVolumeModal}>
-                      创建存储卷
-                    </Button>
-                    <Button icon={<CloudUploadOutlined />}>上传镜像</Button>
-                    <Button icon={<ReloadOutlined />}>刷新</Button>
-                  </Space>
-                </div>
-                
-                <Table 
-                  columns={volumeColumns} 
-                  dataSource={volumeData} 
-                  rowKey="id"
-                  pagination={{ pageSize: 10 }}
-                />
-              </>
-            )
-          }
-        ]} />
+        <Tabs
+          defaultActiveKey="1"
+          items={[
+            {
+              key: '1',
+              label: (
+                <span>
+                  <HddOutlined />
+                  <Badge count={poolData.length} offset={[10, 0]}>
+                    存储池
+                  </Badge>
+                </span>
+              ),
+              children: (
+                <>
+                  <div className="table-operations">
+                    <Space style={{ marginBottom: 16 }}>
+                      <Button type="primary" icon={<PlusOutlined />} onClick={showPoolModal}>
+                        创建存储池
+                      </Button>
+                      <Button icon={<ReloadOutlined />}>刷新</Button>
+                    </Space>
+                  </div>
+
+                  <Table
+                    columns={poolColumns}
+                    dataSource={poolData}
+                    rowKey="id"
+                    pagination={{ pageSize: 10 }}
+                  />
+                </>
+              ),
+            },
+            {
+              key: '2',
+              label: (
+                <span>
+                  <InboxOutlined />
+                  <Badge count={volumeData.length} offset={[10, 0]}>
+                    存储卷
+                  </Badge>
+                </span>
+              ),
+              children: (
+                <>
+                  <div className="table-operations">
+                    <Space style={{ marginBottom: 16 }}>
+                      <Button type="primary" icon={<PlusOutlined />} onClick={showVolumeModal}>
+                        创建存储卷
+                      </Button>
+                      <Button icon={<CloudUploadOutlined />}>上传镜像</Button>
+                      <Button icon={<ReloadOutlined />}>刷新</Button>
+                    </Space>
+                  </div>
+
+                  <Table
+                    columns={volumeColumns}
+                    dataSource={volumeData}
+                    rowKey="id"
+                    pagination={{ pageSize: 10 }}
+                  />
+                </>
+              ),
+            },
+          ]}
+        />
       </Card>
-      
+
       {/* 创建存储池表单 */}
       <Modal
         title="创建存储池"
@@ -535,7 +561,7 @@ const Storage: React.FC = () => {
           form={poolForm}
           layout="vertical"
           name="createStoragePoolForm"
-          initialValues={{ 
+          initialValues={{
             type: 'local',
           }}
         >
@@ -546,7 +572,7 @@ const Storage: React.FC = () => {
           >
             <Input placeholder="请输入存储池名称" />
           </Form.Item>
-          
+
           <Form.Item
             name="type"
             label="存储池类型"
@@ -559,14 +585,14 @@ const Storage: React.FC = () => {
               <Option value="ceph">Ceph</Option>
             </Select>
           </Form.Item>
-          
+
           <Form.Item
             noStyle
             shouldUpdate={(prevValues, currentValues) => prevValues.type !== currentValues.type}
           >
             {({ getFieldValue }) => {
               const type = getFieldValue('type');
-              
+
               if (type === 'local') {
                 return (
                   <Form.Item
@@ -578,7 +604,7 @@ const Storage: React.FC = () => {
                   </Form.Item>
                 );
               }
-              
+
               if (type === 'iscsi') {
                 return (
                   <>
@@ -599,7 +625,7 @@ const Storage: React.FC = () => {
                   </>
                 );
               }
-              
+
               if (type === 'nfs') {
                 return (
                   <>
@@ -620,7 +646,7 @@ const Storage: React.FC = () => {
                   </>
                 );
               }
-              
+
               if (type === 'ceph') {
                 return (
                   <>
@@ -648,20 +674,17 @@ const Storage: React.FC = () => {
                   </>
                 );
               }
-              
+
               return null;
             }}
           </Form.Item>
-          
-          <Form.Item
-            name="description"
-            label="描述"
-          >
+
+          <Form.Item name="description" label="描述">
             <Input.TextArea rows={3} placeholder="请输入存储池描述" />
           </Form.Item>
         </Form>
       </Modal>
-      
+
       {/* 创建存储卷表单 */}
       <Modal
         title="创建存储卷"
@@ -674,7 +697,7 @@ const Storage: React.FC = () => {
           form={volumeForm}
           layout="vertical"
           name="createStorageVolumeForm"
-          initialValues={{ 
+          initialValues={{
             format: 'qcow2',
             size: 10,
           }}
@@ -686,19 +709,23 @@ const Storage: React.FC = () => {
           >
             <Input placeholder="请输入存储卷名称" />
           </Form.Item>
-          
+
           <Form.Item
             name="poolId"
             label="存储池"
             rules={[{ required: true, message: '请选择存储池' }]}
           >
             <Select placeholder="请选择存储池">
-              {poolData.filter(pool => pool.status === 'active').map(pool => (
-                <Option key={pool.id} value={pool.id}>{pool.name}</Option>
-              ))}
+              {poolData
+                .filter(pool => pool.status === 'active')
+                .map(pool => (
+                  <Option key={pool.id} value={pool.id}>
+                    {pool.name}
+                  </Option>
+                ))}
             </Select>
           </Form.Item>
-          
+
           <Form.Item
             name="size"
             label="大小 (GB)"
@@ -706,7 +733,7 @@ const Storage: React.FC = () => {
           >
             <InputNumber min={1} max={1000} style={{ width: '100%' }} />
           </Form.Item>
-          
+
           <Form.Item
             name="format"
             label={
@@ -725,22 +752,16 @@ const Storage: React.FC = () => {
               <Option value="vmdk">vmdk</Option>
             </Select>
           </Form.Item>
-          
-          <Form.Item
-            name="preallocation"
-            label="预分配"
-          >
+
+          <Form.Item name="preallocation" label="预分配">
             <Select placeholder="请选择预分配方式" defaultValue="metadata">
               <Option value="off">关闭 (精简配置)</Option>
               <Option value="metadata">仅元数据</Option>
               <Option value="full">完全分配 (更好的性能)</Option>
             </Select>
           </Form.Item>
-          
-          <Form.Item
-            name="description"
-            label="描述"
-          >
+
+          <Form.Item name="description" label="描述">
             <Input.TextArea rows={3} placeholder="请输入存储卷描述" />
           </Form.Item>
         </Form>

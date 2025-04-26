@@ -12,7 +12,7 @@ import {
   LogoutOutlined,
   BellOutlined,
   AppstoreOutlined,
-  HomeOutlined
+  HomeOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import '../styles/layout.less';
@@ -89,51 +89,67 @@ const MainLayout: React.FC = () => {
   // 根据当前路径生成面包屑项
   const getBreadcrumbItems = () => {
     // 将菜单项转换为映射，方便查找
-    const menuMap = menuItems.reduce((acc, item) => {
-      acc[item.key] = item.label;
-      return acc;
-    }, {} as Record<string, string>);
+    const menuMap = menuItems.reduce(
+      (acc, item) => {
+        acc[item.key] = item.label;
+        return acc;
+      },
+      {} as Record<string, string>
+    );
 
     // 如果是首页或仪表盘
     if (location.pathname === '/' || location.pathname === '/dashboard') {
       return [
         {
-          title: <span><HomeOutlined /> 首页</span>,
-          key: 'home'
-        }
+          title: (
+            <span>
+              <HomeOutlined /> 首页
+            </span>
+          ),
+          key: 'home',
+        },
       ];
     }
 
     // 解析当前路径
     const pathParts = location.pathname.split('/').filter(Boolean);
     let currentPath = '';
-    
+
     // 生成面包屑项
     const breadcrumbItems = [
       {
-        title: <span onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}><HomeOutlined /> 首页</span>,
-        key: 'home'
-      }
+        title: (
+          <span onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
+            <HomeOutlined /> 首页
+          </span>
+        ),
+        key: 'home',
+      },
     ];
 
     // 添加路径部分
     pathParts.forEach((part, index) => {
       currentPath += `/${part}`;
-      
+
       // 如果在菜单映射中存在
       if (menuMap[currentPath]) {
         breadcrumbItems.push({
-          title: index === pathParts.length - 1 
-            ? menuMap[currentPath] 
-            : <span onClick={() => navigate(currentPath)} style={{ cursor: 'pointer' }}>{menuMap[currentPath]}</span>,
-          key: part
+          title:
+            index === pathParts.length - 1 ? (
+              menuMap[currentPath]
+            ) : (
+              <span onClick={() => navigate(currentPath)} style={{ cursor: 'pointer' }}>
+                {menuMap[currentPath]}
+              </span>
+            ),
+          key: part,
         });
       } else {
         // 未知路径，添加格式化的标题
         const formattedTitle = part.charAt(0).toUpperCase() + part.slice(1).replace(/-/g, ' ');
         breadcrumbItems.push({
           title: formattedTitle,
-          key: part
+          key: part,
         });
       }
     });
@@ -180,14 +196,14 @@ const MainLayout: React.FC = () => {
     <Layout style={{ minHeight: '100vh' }}>
       {/* 非移动设备时显示侧边栏 */}
       {!isMobile && (
-        <Sider 
-          trigger={null} 
-          collapsible 
+        <Sider
+          trigger={null}
+          collapsible
           collapsed={collapsed}
           theme="dark"
           className="main-sider"
           breakpoint="lg"
-          onBreakpoint={(broken) => {
+          onBreakpoint={broken => {
             setCollapsed(broken);
           }}
         >
@@ -200,7 +216,7 @@ const MainLayout: React.FC = () => {
             defaultSelectedKeys={[location.pathname]}
             selectedKeys={[location.pathname]}
             items={menuItems}
-            onClick={(e) => {
+            onClick={e => {
               handleMenuClick(e);
               if (isSmall) {
                 setCollapsed(true);
@@ -221,7 +237,7 @@ const MainLayout: React.FC = () => {
                 className="trigger-button"
               />
             )}
-            
+
             {/* 移动设备时显示菜单按钮 */}
             {isMobile && (
               <Button
@@ -231,20 +247,16 @@ const MainLayout: React.FC = () => {
                 className="mobile-menu-button"
               />
             )}
-            
+
             {/* LOGO - 仅在移动设备上显示 */}
             {isMobile && (
               <div className="mobile-logo">
                 <h2>虚拟化平台</h2>
               </div>
             )}
-            
+
             <div className="header-right">
-              <Button 
-                type="text" 
-                icon={<BellOutlined />} 
-                className="notification-button"
-              />
+              <Button type="text" icon={<BellOutlined />} className="notification-button" />
               <Dropdown
                 menu={{
                   items: userMenuItems,
@@ -278,7 +290,7 @@ const MainLayout: React.FC = () => {
           </div>
         </Content>
       </Layout>
-      
+
       {/* 移动设备上的抽屉式菜单 */}
       {isMobile && (
         <Drawer
@@ -298,7 +310,7 @@ const MainLayout: React.FC = () => {
             defaultSelectedKeys={[location.pathname]}
             selectedKeys={[location.pathname]}
             items={menuItems}
-            onClick={(e) => {
+            onClick={e => {
               handleMenuClick(e);
               setDrawerOpen(false);
             }}

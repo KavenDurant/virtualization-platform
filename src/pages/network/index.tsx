@@ -1,15 +1,30 @@
 import React, { useState } from 'react';
-import { Table, Card, Button, Space, Tag, Modal, Form, Input, Select, InputNumber, Tabs, Badge, Typography, Switch, Divider, Tooltip } from 'antd';
-import { 
-  PlusOutlined, 
-  ReloadOutlined, 
+import {
+  Table,
+  Card,
+  Button,
+  Space,
+  Tag,
+  Modal,
+  Form,
+  Input,
+  Select,
+  InputNumber,
+  Tabs,
+  Badge,
+  Typography,
+  Switch,
+  Divider,
+  Tooltip,
+} from 'antd';
+import {
+  PlusOutlined,
+  ReloadOutlined,
   DeleteOutlined,
   EditOutlined,
   GlobalOutlined,
   ApiOutlined,
-  CloudOutlined,
   QuestionCircleOutlined,
-  WifiOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { TabsProps } from 'antd';
@@ -152,7 +167,8 @@ const Network: React.FC = () => {
 
   // 处理创建网络
   const handleNetworkOk = () => {
-    networkForm.validateFields()
+    networkForm
+      .validateFields()
       .then(values => {
         console.log('表单提交-网络:', values);
         networkForm.resetFields();
@@ -170,7 +186,11 @@ const Network: React.FC = () => {
   };
 
   // 处理操作
-  const handleAction = (action: string, type: 'network' | 'interface', record: any) => {
+  const handleAction = (
+    action: string,
+    type: 'network' | 'interface',
+    record: Network | NetworkInterface
+  ) => {
     console.log(`执行操作: ${action}，类型: ${type}，名称: ${record.name}`);
     // 在实际应用中，这里应该调用API来执行相应的操作
   };
@@ -179,7 +199,7 @@ const Network: React.FC = () => {
   const renderNetworkStatusTag = (status: string) => {
     let color = 'green';
     let text = '活跃';
-    
+
     if (status === 'inactive') {
       color = 'orange';
       text = '未激活';
@@ -187,7 +207,7 @@ const Network: React.FC = () => {
       color = 'red';
       text = '错误';
     }
-    
+
     return <Tag color={color}>{text}</Tag>;
   };
 
@@ -195,12 +215,12 @@ const Network: React.FC = () => {
   const renderInterfaceStatusTag = (status: string) => {
     let color = 'green';
     let text = '连接';
-    
+
     if (status === 'down') {
       color = 'orange';
       text = '断开';
     }
-    
+
     return <Tag color={color}>{text}</Tag>;
   };
 
@@ -216,12 +236,12 @@ const Network: React.FC = () => {
       title: '类型',
       dataIndex: 'type',
       key: 'type',
-      render: (type) => {
+      render: type => {
         const typeMap: Record<string, string> = {
-          'bridge': '桥接',
-          'nat': 'NAT',
-          'isolated': '隔离',
-          'direct': '直连',
+          bridge: '桥接',
+          nat: 'NAT',
+          isolated: '隔离',
+          direct: '直连',
         };
         return typeMap[type] || type;
       },
@@ -237,7 +257,7 @@ const Network: React.FC = () => {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => renderNetworkStatusTag(status),
+      render: status => renderNetworkStatusTag(status),
       filters: [
         { text: '活跃', value: 'active' },
         { text: '未激活', value: 'inactive' },
@@ -249,19 +269,19 @@ const Network: React.FC = () => {
       title: '子网',
       dataIndex: 'subnet',
       key: 'subnet',
-      render: (subnet) => subnet || '-',
+      render: subnet => subnet || '-',
     },
     {
       title: '网关',
       dataIndex: 'gateway',
       key: 'gateway',
-      render: (gateway) => gateway || '-',
+      render: gateway => gateway || '-',
     },
     {
       title: 'DHCP',
       dataIndex: 'dhcp',
       key: 'dhcp',
-      render: (dhcp) => dhcp ? <Tag color="green">启用</Tag> : <Tag color="orange">禁用</Tag>,
+      render: dhcp => (dhcp ? <Tag color="green">启用</Tag> : <Tag color="orange">禁用</Tag>),
       filters: [
         { text: '启用', value: true },
         { text: '禁用', value: false },
@@ -279,15 +299,15 @@ const Network: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="small">
-          <Button 
-            type="text" 
-            icon={<EditOutlined />} 
+          <Button
+            type="text"
+            icon={<EditOutlined />}
             onClick={() => handleAction('编辑', 'network', record)}
             title="编辑"
           />
           {record.status !== 'active' ? (
-            <Button 
-              type="text" 
+            <Button
+              type="text"
               style={{ color: 'green' }}
               onClick={() => handleAction('启动', 'network', record)}
               title="启动"
@@ -295,8 +315,8 @@ const Network: React.FC = () => {
               启动
             </Button>
           ) : (
-            <Button 
-              type="text" 
+            <Button
+              type="text"
               style={{ color: 'orange' }}
               onClick={() => handleAction('停止', 'network', record)}
               title="停止"
@@ -304,10 +324,10 @@ const Network: React.FC = () => {
               停止
             </Button>
           )}
-          <Button 
-            type="text" 
-            danger 
-            icon={<DeleteOutlined />} 
+          <Button
+            type="text"
+            danger
+            icon={<DeleteOutlined />}
             onClick={() => handleAction('删除', 'network', record)}
             title="删除"
             disabled={record.vmCount > 0}
@@ -357,19 +377,19 @@ const Network: React.FC = () => {
       title: 'IP地址',
       dataIndex: 'ipAddress',
       key: 'ipAddress',
-      render: (ipAddress) => ipAddress || '-',
+      render: ipAddress => ipAddress || '-',
     },
     {
       title: 'VLAN ID',
       dataIndex: 'vlanId',
       key: 'vlanId',
-      render: (vlanId) => vlanId || '-',
+      render: vlanId => vlanId || '-',
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => renderInterfaceStatusTag(status),
+      render: status => renderInterfaceStatusTag(status),
       filters: [
         { text: '连接', value: 'up' },
         { text: '断开', value: 'down' },
@@ -382,8 +402,8 @@ const Network: React.FC = () => {
       render: (_, record) => (
         <Space size="small">
           {record.status === 'down' ? (
-            <Button 
-              type="text" 
+            <Button
+              type="text"
               style={{ color: 'green' }}
               onClick={() => handleAction('连接', 'interface', record)}
               title="连接"
@@ -391,8 +411,8 @@ const Network: React.FC = () => {
               连接
             </Button>
           ) : (
-            <Button 
-              type="text" 
+            <Button
+              type="text"
               style={{ color: 'orange' }}
               onClick={() => handleAction('断开', 'interface', record)}
               title="断开"
@@ -400,9 +420,9 @@ const Network: React.FC = () => {
               断开
             </Button>
           )}
-          <Button 
-            type="text" 
-            icon={<EditOutlined />} 
+          <Button
+            type="text"
+            icon={<EditOutlined />}
             onClick={() => handleAction('编辑', 'interface', record)}
             title="编辑"
           />
@@ -433,15 +453,15 @@ const Network: React.FC = () => {
               <Button icon={<ReloadOutlined />}>刷新</Button>
             </Space>
           </div>
-          
-          <Table 
-            columns={networkColumns} 
-            dataSource={networkData} 
+
+          <Table
+            columns={networkColumns}
+            dataSource={networkData}
             rowKey="id"
             pagination={{ pageSize: 10 }}
           />
         </>
-      )
+      ),
     },
     {
       key: '2',
@@ -460,23 +480,23 @@ const Network: React.FC = () => {
               <Button icon={<ReloadOutlined />}>刷新</Button>
             </Space>
           </div>
-          
-          <Table 
-            columns={interfaceColumns} 
-            dataSource={interfaceData} 
+
+          <Table
+            columns={interfaceColumns}
+            dataSource={interfaceData}
             rowKey="id"
             pagination={{ pageSize: 10 }}
           />
         </>
-      )
-    }
+      ),
+    },
   ];
 
   // 渲染网络概览
   const renderNetworkOverview = () => {
     const activeNetworks = networkData.filter(network => network.status === 'active').length;
     const totalVms = networkData.reduce((sum, network) => sum + network.vmCount, 0);
-    
+
     return (
       <Card style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', gap: 32 }}>
@@ -496,13 +516,13 @@ const Network: React.FC = () => {
   return (
     <div className="network-container">
       <h1>网络管理</h1>
-      
+
       {renderNetworkOverview()}
-      
+
       <Card>
         <Tabs items={tabItems} />
       </Card>
-      
+
       {/* 创建网络表单 */}
       <Modal
         title="创建网络"
@@ -515,7 +535,7 @@ const Network: React.FC = () => {
           form={networkForm}
           layout="vertical"
           name="createNetworkForm"
-          initialValues={{ 
+          initialValues={{
             type: 'nat',
             dhcp: true,
           }}
@@ -527,7 +547,7 @@ const Network: React.FC = () => {
           >
             <Input placeholder="请输入网络名称" />
           </Form.Item>
-          
+
           <Form.Item
             name="type"
             label={
@@ -547,14 +567,14 @@ const Network: React.FC = () => {
               <Option value="direct">直连网络</Option>
             </Select>
           </Form.Item>
-          
+
           <Form.Item
             noStyle
             shouldUpdate={(prevValues, currentValues) => prevValues.type !== currentValues.type}
           >
             {({ getFieldValue }) => {
               const type = getFieldValue('type');
-              
+
               if (type === 'bridge') {
                 return (
                   <>
@@ -565,17 +585,13 @@ const Network: React.FC = () => {
                     >
                       <Input placeholder="请输入桥接接口名称，例如: br0" />
                     </Form.Item>
-                    <Form.Item
-                      name="existingBridge"
-                      label="使用现有桥接"
-                      valuePropName="checked"
-                    >
+                    <Form.Item name="existingBridge" label="使用现有桥接" valuePropName="checked">
                       <Switch />
                     </Form.Item>
                   </>
                 );
               }
-              
+
               if (type === 'direct') {
                 return (
                   <>
@@ -601,7 +617,7 @@ const Network: React.FC = () => {
                   </>
                 );
               }
-              
+
               if (type === 'nat' || type === 'isolated') {
                 return (
                   <>
@@ -619,21 +635,19 @@ const Network: React.FC = () => {
                     >
                       <Input placeholder="请输入网关，例如: 192.168.100.1" />
                     </Form.Item>
-                    <Form.Item
-                      name="dhcp"
-                      label="DHCP"
-                      valuePropName="checked"
-                    >
+                    <Form.Item name="dhcp" label="DHCP" valuePropName="checked">
                       <Switch defaultChecked />
                     </Form.Item>
-                    
+
                     <Form.Item
                       noStyle
-                      shouldUpdate={(prevValues, currentValues) => prevValues.dhcp !== currentValues.dhcp}
+                      shouldUpdate={(prevValues, currentValues) =>
+                        prevValues.dhcp !== currentValues.dhcp
+                      }
                     >
                       {({ getFieldValue }) => {
                         const dhcp = getFieldValue('dhcp');
-                        
+
                         if (dhcp) {
                           return (
                             <>
@@ -654,35 +668,31 @@ const Network: React.FC = () => {
                             </>
                           );
                         }
-                        
+
                         return null;
                       }}
                     </Form.Item>
                   </>
                 );
               }
-              
+
               return null;
             }}
           </Form.Item>
-          
+
           <Divider />
-          
-          <Form.Item
-            name="vlan"
-            label="启用VLAN"
-            valuePropName="checked"
-          >
+
+          <Form.Item name="vlan" label="启用VLAN" valuePropName="checked">
             <Switch />
           </Form.Item>
-          
+
           <Form.Item
             noStyle
             shouldUpdate={(prevValues, currentValues) => prevValues.vlan !== currentValues.vlan}
           >
             {({ getFieldValue }) => {
               const vlan = getFieldValue('vlan');
-              
+
               if (vlan) {
                 return (
                   <Form.Item
@@ -690,19 +700,21 @@ const Network: React.FC = () => {
                     label="VLAN ID"
                     rules={[{ required: true, message: '请输入VLAN ID' }]}
                   >
-                    <InputNumber min={1} max={4094} style={{ width: '100%' }} placeholder="请输入VLAN ID (1-4094)" />
+                    <InputNumber
+                      min={1}
+                      max={4094}
+                      style={{ width: '100%' }}
+                      placeholder="请输入VLAN ID (1-4094)"
+                    />
                   </Form.Item>
                 );
               }
-              
+
               return null;
             }}
           </Form.Item>
-          
-          <Form.Item
-            name="description"
-            label="描述"
-          >
+
+          <Form.Item name="description" label="描述">
             <Input.TextArea rows={3} placeholder="请输入网络描述" />
           </Form.Item>
         </Form>

@@ -1,94 +1,168 @@
 import React, { useState } from 'react';
-import { Card, Tabs, Form, Input, Button, Switch, Select, InputNumber, Space, message, Upload, Divider, Typography, Radio, Row, Col } from 'antd';
-import { 
-  SettingOutlined, 
-  SecurityScanOutlined, 
-  MailOutlined, 
-  CloudServerOutlined, 
+import {
+  Card,
+  Tabs,
+  Form,
+  Input,
+  Button,
+  Switch,
+  Select,
+  InputNumber,
+  Space,
+  message,
+  Upload,
+  Divider,
+  Typography,
+  Radio,
+  Row,
+  Col,
+} from 'antd';
+import {
+  SettingOutlined,
+  SecurityScanOutlined,
+  MailOutlined,
+  CloudServerOutlined,
   SafetyOutlined,
   UploadOutlined,
   SaveOutlined,
   QuestionCircleOutlined,
-  SyncOutlined
+  SyncOutlined,
 } from '@ant-design/icons';
 import type { TabsProps } from 'antd';
-import type { UploadFile } from 'antd/es/upload/interface';
+import type { UploadFile, UploadChangeParam } from 'antd/es/upload/interface';
 
 const { Option } = Select;
-const { Title, Text, Paragraph } = Typography;
+const { Title, Paragraph } = Typography;
+
+// 定义表单值的接口
+interface GeneralFormValues {
+  systemName: string;
+  systemLogo?: UploadFile[];
+  adminEmail: string;
+  language: string;
+  timezone: string;
+  dateFormat: string;
+  timeFormat: string;
+  sessionTimeout: number;
+  showWelcome: boolean;
+}
+
+interface SecurityFormValues {
+  useHttps: boolean;
+  tlsVersion?: string;
+  sslCert?: UploadFile[];
+  sslKey?: UploadFile[];
+  passwordPolicy: string;
+  minPasswordLength: number;
+  passwordExpireDays: number;
+  lockAfterFailures: number;
+  useTwoFactor: boolean;
+  twoFactorMethod?: string;
+  allowedIpRanges?: string;
+  enableFirewall: boolean;
+  auditLogRetention: number;
+}
+
+interface EmailFormValues {
+  smtpServer: string;
+  smtpPort: number;
+  smtpSecure: string;
+  smtpUser: string;
+  smtpPassword: string;
+  emailFrom: string;
+  enableEmailAlerts: boolean;
+}
+
+interface BackupFormValues {
+  enableAutoBackup: boolean;
+  backupFrequency: string;
+  backupTime: string;
+  backupType: string;
+  backupPath?: string;
+  nfsServer?: string;
+  nfsPath?: string;
+  ftpServer?: string;
+  ftpUser?: string;
+  ftpPassword?: string;
+  ftpPath?: string;
+  s3Endpoint?: string;
+  s3Bucket?: string;
+  s3AccessKey?: string;
+  s3SecretKey?: string;
+  s3Region?: string;
+  retentionCount: number;
+  compressBackup: boolean;
+}
 
 const Settings: React.FC = () => {
   const [generalForm] = Form.useForm();
   const [securityForm] = Form.useForm();
   const [emailForm] = Form.useForm();
   const [backupForm] = Form.useForm();
-  
+
   const [logoFile, setLogoFile] = useState<UploadFile[]>([]);
   const [useHttps, setUseHttps] = useState(true);
   const [useTwoFactor, setUseTwoFactor] = useState(false);
   const [backupType, setBackupType] = useState('local');
-  
+
   // 处理表单提交
-  const handleGeneralSubmit = (values: any) => {
+  const handleGeneralSubmit = (values: GeneralFormValues) => {
     console.log('提交一般设置:', values);
     message.success('一般设置已保存');
   };
-  
-  const handleSecuritySubmit = (values: any) => {
+
+  const handleSecuritySubmit = (values: SecurityFormValues) => {
     console.log('提交安全设置:', values);
     message.success('安全设置已保存');
   };
-  
-  const handleEmailSubmit = (values: any) => {
+
+  const handleEmailSubmit = (values: EmailFormValues) => {
     console.log('提交邮件设置:', values);
     message.success('邮件设置已保存');
   };
-  
-  const handleBackupSubmit = (values: any) => {
+
+  const handleBackupSubmit = (values: BackupFormValues) => {
     console.log('提交备份设置:', values);
     message.success('备份设置已保存');
   };
-  
+
   // 测试邮件连接
   const handleTestEmail = () => {
-    message.loading('正在发送测试邮件...', 1.5)
-      .then(() => message.success('测试邮件发送成功!'));
+    message.loading('正在发送测试邮件...', 1.5).then(() => message.success('测试邮件发送成功!'));
   };
-  
+
   // 测试备份连接
   const handleTestBackup = () => {
-    message.loading('正在测试备份连接...', 1.5)
-      .then(() => message.success('备份连接测试成功!'));
+    message.loading('正在测试备份连接...', 1.5).then(() => message.success('备份连接测试成功!'));
   };
-  
+
   // 手动备份
   const handleManualBackup = () => {
-    message.loading('正在执行备份...', 2)
-      .then(() => message.success('备份执行成功!'));
+    message.loading('正在执行备份...', 2).then(() => message.success('备份执行成功!'));
   };
-  
+
   // 上传处理
-  const handleLogoChange = (info: any) => {
+  const handleLogoChange = (info: UploadChangeParam) => {
     setLogoFile(info.fileList);
-    
+
     if (info.file.status === 'done') {
       message.success(`${info.file.name} 上传成功`);
     } else if (info.file.status === 'error') {
       message.error(`${info.file.name} 上传失败`);
     }
   };
-  
+
   // 表单项的布局
   const formItemLayout = {
     labelCol: { span: 6 },
     wrapperCol: { span: 14 },
   };
-  
+
   // 表单按钮的布局
   const buttonItemLayout = {
     wrapperCol: { span: 14, offset: 6 },
   };
-  
+
   // 标签页配置
   const items: TabsProps['items'] = [
     {
@@ -112,13 +186,13 @@ const Settings: React.FC = () => {
             dateFormat: 'YYYY-MM-DD',
             timeFormat: 'HH:mm:ss',
             sessionTimeout: 30,
-            showWelcome: true
+            showWelcome: true,
           }}
         >
           <Title level={4}>基本设置</Title>
           <Paragraph>配置系统的基本参数</Paragraph>
           <Divider />
-          
+
           <Form.Item
             name="systemName"
             label="系统名称"
@@ -126,11 +200,8 @@ const Settings: React.FC = () => {
           >
             <Input placeholder="请输入系统名称" />
           </Form.Item>
-          
-          <Form.Item
-            name="systemLogo"
-            label="系统Logo"
-          >
+
+          <Form.Item name="systemLogo" label="系统Logo">
             <Upload
               action="/api/upload/logo"
               listType="picture"
@@ -141,18 +212,18 @@ const Settings: React.FC = () => {
               <Button icon={<UploadOutlined />}>上传Logo</Button>
             </Upload>
           </Form.Item>
-          
+
           <Form.Item
             name="adminEmail"
             label="管理员邮箱"
             rules={[
               { required: true, message: '请输入管理员邮箱' },
-              { type: 'email', message: '请输入有效的邮箱地址' }
+              { type: 'email', message: '请输入有效的邮箱地址' },
             ]}
           >
             <Input placeholder="请输入管理员邮箱" />
           </Form.Item>
-          
+
           <Form.Item
             name="language"
             label="系统语言"
@@ -163,7 +234,7 @@ const Settings: React.FC = () => {
               <Option value="en_US">English</Option>
             </Select>
           </Form.Item>
-          
+
           <Form.Item
             name="timezone"
             label="时区"
@@ -176,7 +247,7 @@ const Settings: React.FC = () => {
               <Option value="Asia/Tokyo">日本标准时间</Option>
             </Select>
           </Form.Item>
-          
+
           <Form.Item
             name="dateFormat"
             label="日期格式"
@@ -188,7 +259,7 @@ const Settings: React.FC = () => {
               <Option value="MM/DD/YYYY">MM/DD/YYYY</Option>
             </Select>
           </Form.Item>
-          
+
           <Form.Item
             name="timeFormat"
             label="时间格式"
@@ -199,7 +270,7 @@ const Settings: React.FC = () => {
               <Option value="hh:mm:ss a">12小时制 (hh:mm:ss a)</Option>
             </Select>
           </Form.Item>
-          
+
           <Form.Item
             name="sessionTimeout"
             label="会话超时(分钟)"
@@ -207,15 +278,11 @@ const Settings: React.FC = () => {
           >
             <InputNumber min={5} max={120} style={{ width: '100%' }} />
           </Form.Item>
-          
-          <Form.Item
-            name="showWelcome"
-            label="显示欢迎信息"
-            valuePropName="checked"
-          >
+
+          <Form.Item name="showWelcome" label="显示欢迎信息" valuePropName="checked">
             <Switch />
           </Form.Item>
-          
+
           <Form.Item {...buttonItemLayout}>
             <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
               保存设置
@@ -248,21 +315,17 @@ const Settings: React.FC = () => {
             twoFactorMethod: 'totp',
             allowedIpRanges: '',
             enableFirewall: true,
-            auditLogRetention: 365
+            auditLogRetention: 365,
           }}
         >
           <Title level={4}>安全设置</Title>
           <Paragraph>配置系统的安全参数，确保符合国保测要求</Paragraph>
           <Divider />
-          
-          <Form.Item
-            name="useHttps"
-            label="使用HTTPS"
-            valuePropName="checked"
-          >
+
+          <Form.Item name="useHttps" label="使用HTTPS" valuePropName="checked">
             <Switch checked={useHttps} onChange={setUseHttps} />
           </Form.Item>
-          
+
           {useHttps && (
             <>
               <Form.Item
@@ -275,33 +338,21 @@ const Settings: React.FC = () => {
                   <Option value="TLSv1.3">TLS 1.3 (推荐)</Option>
                 </Select>
               </Form.Item>
-              
-              <Form.Item
-                name="sslCert"
-                label="SSL证书"
-              >
-                <Upload
-                  action="/api/upload/cert"
-                  maxCount={1}
-                >
+
+              <Form.Item name="sslCert" label="SSL证书">
+                <Upload action="/api/upload/cert" maxCount={1}>
                   <Button icon={<UploadOutlined />}>上传SSL证书</Button>
                 </Upload>
               </Form.Item>
-              
-              <Form.Item
-                name="sslKey"
-                label="SSL私钥"
-              >
-                <Upload
-                  action="/api/upload/key"
-                  maxCount={1}
-                >
+
+              <Form.Item name="sslKey" label="SSL私钥">
+                <Upload action="/api/upload/key" maxCount={1}>
                   <Button icon={<UploadOutlined />}>上传SSL私钥</Button>
                 </Upload>
               </Form.Item>
             </>
           )}
-          
+
           <Form.Item
             name="passwordPolicy"
             label="密码策略"
@@ -314,7 +365,7 @@ const Settings: React.FC = () => {
               <Option value="custom">自定义</Option>
             </Select>
           </Form.Item>
-          
+
           <Form.Item
             name="minPasswordLength"
             label="最小密码长度"
@@ -322,7 +373,7 @@ const Settings: React.FC = () => {
           >
             <InputNumber min={6} max={16} style={{ width: '100%' }} />
           </Form.Item>
-          
+
           <Form.Item
             name="passwordExpireDays"
             label="密码过期天数"
@@ -330,7 +381,7 @@ const Settings: React.FC = () => {
           >
             <InputNumber min={0} max={365} style={{ width: '100%' }} />
           </Form.Item>
-          
+
           <Form.Item
             name="lockAfterFailures"
             label="失败锁定次数"
@@ -339,15 +390,11 @@ const Settings: React.FC = () => {
           >
             <InputNumber min={0} max={10} style={{ width: '100%' }} />
           </Form.Item>
-          
-          <Form.Item
-            name="useTwoFactor"
-            label="双因素认证"
-            valuePropName="checked"
-          >
+
+          <Form.Item name="useTwoFactor" label="双因素认证" valuePropName="checked">
             <Switch checked={useTwoFactor} onChange={setUseTwoFactor} />
           </Form.Item>
-          
+
           {useTwoFactor && (
             <Form.Item
               name="twoFactorMethod"
@@ -361,7 +408,7 @@ const Settings: React.FC = () => {
               </Radio.Group>
             </Form.Item>
           )}
-          
+
           <Form.Item
             name="allowedIpRanges"
             label="允许的IP范围"
@@ -369,15 +416,11 @@ const Settings: React.FC = () => {
           >
             <Input placeholder="例如: 192.168.1.0/24,10.0.0.1" />
           </Form.Item>
-          
-          <Form.Item
-            name="enableFirewall"
-            label="启用防火墙"
-            valuePropName="checked"
-          >
+
+          <Form.Item name="enableFirewall" label="启用防火墙" valuePropName="checked">
             <Switch />
           </Form.Item>
-          
+
           <Form.Item
             name="auditLogRetention"
             label="审计日志保留天数"
@@ -385,7 +428,7 @@ const Settings: React.FC = () => {
           >
             <InputNumber min={30} max={3650} style={{ width: '100%' }} />
           </Form.Item>
-          
+
           <Form.Item {...buttonItemLayout}>
             <Button type="primary" htmlType="submit" icon={<SaveOutlined />} danger>
               保存安全设置
@@ -413,13 +456,13 @@ const Settings: React.FC = () => {
             smtpSecure: 'tls',
             smtpUser: 'system@example.com',
             emailFrom: 'system@example.com',
-            enableEmailAlerts: true
+            enableEmailAlerts: true,
           }}
         >
           <Title level={4}>邮件设置</Title>
           <Paragraph>配置系统的邮件服务器参数</Paragraph>
           <Divider />
-          
+
           <Form.Item
             name="smtpServer"
             label="SMTP服务器"
@@ -427,7 +470,7 @@ const Settings: React.FC = () => {
           >
             <Input placeholder="请输入SMTP服务器地址" />
           </Form.Item>
-          
+
           <Form.Item
             name="smtpPort"
             label="SMTP端口"
@@ -435,7 +478,7 @@ const Settings: React.FC = () => {
           >
             <InputNumber min={1} max={65535} style={{ width: '100%' }} />
           </Form.Item>
-          
+
           <Form.Item
             name="smtpSecure"
             label="连接安全"
@@ -447,7 +490,7 @@ const Settings: React.FC = () => {
               <Option value="tls">TLS</Option>
             </Select>
           </Form.Item>
-          
+
           <Form.Item
             name="smtpUser"
             label="SMTP用户名"
@@ -455,7 +498,7 @@ const Settings: React.FC = () => {
           >
             <Input placeholder="请输入SMTP用户名" />
           </Form.Item>
-          
+
           <Form.Item
             name="smtpPassword"
             label="SMTP密码"
@@ -463,26 +506,22 @@ const Settings: React.FC = () => {
           >
             <Input.Password placeholder="请输入SMTP密码" />
           </Form.Item>
-          
+
           <Form.Item
             name="emailFrom"
             label="发件人地址"
             rules={[
               { required: true, message: '请输入发件人地址' },
-              { type: 'email', message: '请输入有效的邮箱地址' }
+              { type: 'email', message: '请输入有效的邮箱地址' },
             ]}
           >
             <Input placeholder="请输入发件人地址" />
           </Form.Item>
-          
-          <Form.Item
-            name="enableEmailAlerts"
-            label="启用邮件警报"
-            valuePropName="checked"
-          >
+
+          <Form.Item name="enableEmailAlerts" label="启用邮件警报" valuePropName="checked">
             <Switch />
           </Form.Item>
-          
+
           <Form.Item {...buttonItemLayout}>
             <Space>
               <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
@@ -516,21 +555,17 @@ const Settings: React.FC = () => {
             backupType: 'local',
             backupPath: '/var/backups/virtualization-platform',
             retentionCount: 7,
-            compressBackup: true
+            compressBackup: true,
           }}
         >
           <Title level={4}>备份设置</Title>
           <Paragraph>配置系统的自动备份参数</Paragraph>
           <Divider />
-          
-          <Form.Item
-            name="enableAutoBackup"
-            label="启用自动备份"
-            valuePropName="checked"
-          >
+
+          <Form.Item name="enableAutoBackup" label="启用自动备份" valuePropName="checked">
             <Switch />
           </Form.Item>
-          
+
           <Form.Item
             name="backupFrequency"
             label="备份频率"
@@ -543,7 +578,7 @@ const Settings: React.FC = () => {
               <Option value="monthly">每月</Option>
             </Select>
           </Form.Item>
-          
+
           <Form.Item
             name="backupTime"
             label="备份时间"
@@ -551,24 +586,20 @@ const Settings: React.FC = () => {
           >
             <Input placeholder="请输入备份时间，例如: 02:00" />
           </Form.Item>
-          
+
           <Form.Item
             name="backupType"
             label="备份类型"
             rules={[{ required: true, message: '请选择备份类型' }]}
           >
-            <Select 
-              placeholder="请选择备份类型" 
-              value={backupType} 
-              onChange={setBackupType}
-            >
+            <Select placeholder="请选择备份类型" value={backupType} onChange={setBackupType}>
               <Option value="local">本地备份</Option>
               <Option value="nfs">NFS</Option>
               <Option value="ftp">FTP</Option>
               <Option value="s3">S3兼容存储</Option>
             </Select>
           </Form.Item>
-          
+
           {backupType === 'local' && (
             <Form.Item
               name="backupPath"
@@ -578,7 +609,7 @@ const Settings: React.FC = () => {
               <Input placeholder="请输入本地备份路径" />
             </Form.Item>
           )}
-          
+
           {backupType === 'nfs' && (
             <>
               <Form.Item
@@ -597,7 +628,7 @@ const Settings: React.FC = () => {
               </Form.Item>
             </>
           )}
-          
+
           {backupType === 'ftp' && (
             <>
               <Form.Item
@@ -630,7 +661,7 @@ const Settings: React.FC = () => {
               </Form.Item>
             </>
           )}
-          
+
           {backupType === 's3' && (
             <>
               <Form.Item
@@ -661,15 +692,12 @@ const Settings: React.FC = () => {
               >
                 <Input.Password placeholder="请输入秘密访问密钥" />
               </Form.Item>
-              <Form.Item
-                name="s3Region"
-                label="区域"
-              >
+              <Form.Item name="s3Region" label="区域">
                 <Input placeholder="请输入S3区域（可选）" />
               </Form.Item>
             </>
           )}
-          
+
           <Form.Item
             name="retentionCount"
             label="保留备份数量"
@@ -677,15 +705,11 @@ const Settings: React.FC = () => {
           >
             <InputNumber min={1} max={365} style={{ width: '100%' }} />
           </Form.Item>
-          
-          <Form.Item
-            name="compressBackup"
-            label="压缩备份"
-            valuePropName="checked"
-          >
+
+          <Form.Item name="compressBackup" label="压缩备份" valuePropName="checked">
             <Switch />
           </Form.Item>
-          
+
           <Form.Item {...buttonItemLayout}>
             <Space>
               <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
@@ -715,7 +739,7 @@ const Settings: React.FC = () => {
           <Title level={4}>安全扫描</Title>
           <Paragraph>对系统进行安全性检查，确保符合国保测要求</Paragraph>
           <Divider />
-          
+
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Card title="漏洞扫描">
@@ -726,7 +750,7 @@ const Settings: React.FC = () => {
                 </Space>
               </Card>
             </Col>
-            
+
             <Col span={24}>
               <Card title="安全合规检查">
                 <p>检查系统是否符合国保测要求和安全最佳实践</p>
@@ -736,12 +760,14 @@ const Settings: React.FC = () => {
                 </Space>
               </Card>
             </Col>
-            
+
             <Col span={24}>
               <Card title="安全加固">
                 <p>根据安全扫描结果，对系统进行自动加固</p>
                 <Space style={{ marginTop: 16 }}>
-                  <Button type="primary" danger>一键加固</Button>
+                  <Button type="primary" danger>
+                    一键加固
+                  </Button>
                   <Button>查看加固历史</Button>
                 </Space>
               </Card>
@@ -755,7 +781,7 @@ const Settings: React.FC = () => {
   return (
     <div className="settings-container">
       <h1>系统设置</h1>
-      
+
       <Card>
         <Tabs defaultActiveKey="1" items={items} type="card" />
       </Card>

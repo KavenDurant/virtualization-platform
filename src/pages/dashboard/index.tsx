@@ -104,7 +104,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="dashboard-container">
       <h1>系统仪表盘</h1>
-      
+
       {/* 系统概览统计卡片 */}
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} md={6}>
@@ -150,7 +150,7 @@ const Dashboard: React.FC = () => {
           </Card>
         </Col>
       </Row>
-      
+
       {/* 资源使用情况 */}
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         <Col xs={24} md={12}>
@@ -170,14 +170,10 @@ const Dashboard: React.FC = () => {
           </Card>
         </Col>
       </Row>
-      
+
       {/* 虚拟机列表 */}
       <Card title="虚拟机状态" style={{ marginTop: 16 }}>
-        <Table 
-          columns={columns} 
-          dataSource={vmData} 
-          pagination={false} 
-        />
+        <Table columns={columns} dataSource={vmData} pagination={false} />
       </Card>
     </div>
   );

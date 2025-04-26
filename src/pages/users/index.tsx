@@ -1,8 +1,24 @@
 import React, { useState } from 'react';
-import { Table, Card, Button, Space, Tag, Modal, Form, Input, Select, Switch, Tabs, Badge, Typography, Avatar, Tooltip, Popconfirm } from 'antd';
-import { 
-  PlusOutlined, 
-  ReloadOutlined, 
+import {
+  Table,
+  Card,
+  Button,
+  Space,
+  Tag,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Switch,
+  Tabs,
+  Badge,
+  Typography,
+  Avatar,
+  Popconfirm,
+} from 'antd';
+import {
+  PlusOutlined,
+  ReloadOutlined,
   DeleteOutlined,
   EditOutlined,
   UserOutlined,
@@ -10,12 +26,9 @@ import {
   KeyOutlined,
   LockOutlined,
   UnlockOutlined,
-  SafetyOutlined,
   EyeOutlined,
   EyeInvisibleOutlined,
 } from '@ant-design/icons';
-import type { ColumnsType } from 'antd/es/table';
-import type { TabsProps } from 'antd';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -150,7 +163,8 @@ const Users: React.FC = () => {
 
   // 处理创建/编辑用户
   const handleUserOk = () => {
-    userForm.validateFields()
+    userForm
+      .validateFields()
       .then(values => {
         console.log('表单提交-用户:', values);
         userForm.resetFields();
@@ -176,7 +190,8 @@ const Users: React.FC = () => {
 
   // 处理创建用户组
   const handleGroupOk = () => {
-    groupForm.validateFields()
+    groupForm
+      .validateFields()
       .then(values => {
         console.log('表单提交-用户组:', values);
         groupForm.resetFields();
@@ -201,7 +216,8 @@ const Users: React.FC = () => {
 
   // 处理修改密码
   const handlePasswordOk = () => {
-    passwordForm.validateFields()
+    passwordForm
+      .validateFields()
       .then(values => {
         console.log('表单提交-密码修改:', values);
         passwordForm.resetFields();
@@ -236,7 +252,7 @@ const Users: React.FC = () => {
   const renderUserStatusTag = (status: string) => {
     let color = 'green';
     let text = '活跃';
-    
+
     if (status === 'inactive') {
       color = 'orange';
       text = '未激活';
@@ -244,7 +260,7 @@ const Users: React.FC = () => {
       color = 'red';
       text = '已锁定';
     }
-    
+
     return <Tag color={color}>{text}</Tag>;
   };
 
@@ -252,7 +268,7 @@ const Users: React.FC = () => {
   const renderUserRoleTag = (role: string) => {
     let color = 'blue';
     let text = '用户';
-    
+
     if (role === 'admin') {
       color = 'purple';
       text = '管理员';
@@ -260,7 +276,7 @@ const Users: React.FC = () => {
       color = 'cyan';
       text = '运维人员';
     }
-    
+
     return <Tag color={color}>{text}</Tag>;
   };
 
@@ -286,7 +302,7 @@ const Users: React.FC = () => {
       title: '角色',
       dataIndex: 'role',
       key: 'role',
-      render: (role) => renderUserRoleTag(role),
+      render: role => renderUserRoleTag(role),
       filters: [
         { text: '管理员', value: 'admin' },
         { text: '运维人员', value: 'operator' },
@@ -298,7 +314,7 @@ const Users: React.FC = () => {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => renderUserStatusTag(status),
+      render: status => renderUserStatusTag(status),
       filters: [
         { text: '活跃', value: 'active' },
         { text: '未激活', value: 'inactive' },
@@ -327,37 +343,37 @@ const Users: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="small">
-          <Button 
-            type="text" 
-            icon={<EditOutlined />} 
+          <Button
+            type="text"
+            icon={<EditOutlined />}
             onClick={() => showUserModal(record)}
             title="编辑"
           />
-          <Button 
-            type="text" 
-            icon={<KeyOutlined />} 
+          <Button
+            type="text"
+            icon={<KeyOutlined />}
             onClick={() => showPasswordModal(record)}
             title="修改密码"
           />
           {record.status === 'active' ? (
-            <Button 
-              type="text" 
-              icon={<LockOutlined />} 
+            <Button
+              type="text"
+              icon={<LockOutlined />}
               style={{ color: 'orange' }}
               onClick={() => handleUserAction('锁定', record)}
               title="锁定"
             />
           ) : record.status === 'locked' ? (
-            <Button 
-              type="text" 
-              icon={<UnlockOutlined />} 
+            <Button
+              type="text"
+              icon={<UnlockOutlined />}
               style={{ color: 'green' }}
               onClick={() => handleUserAction('解锁', record)}
               title="解锁"
             />
           ) : (
-            <Button 
-              type="text" 
+            <Button
+              type="text"
               style={{ color: 'green' }}
               onClick={() => handleUserAction('激活', record)}
               title="激活"
@@ -372,10 +388,10 @@ const Users: React.FC = () => {
             cancelText="取消"
             disabled={record.username === 'admin'}
           >
-            <Button 
-              type="text" 
-              danger 
-              icon={<DeleteOutlined />} 
+            <Button
+              type="text"
+              danger
+              icon={<DeleteOutlined />}
               disabled={record.username === 'admin'}
               title="删除"
             />
@@ -408,10 +424,12 @@ const Users: React.FC = () => {
       title: '权限',
       dataIndex: 'permissions',
       key: 'permissions',
-      render: (permissions) => (
+      render: permissions => (
         <Space wrap>
           {permissions.map((perm: string) => (
-            <Tag key={perm} color="blue">{perm}</Tag>
+            <Tag key={perm} color="blue">
+              {perm}
+            </Tag>
           ))}
         </Space>
       ),
@@ -427,15 +445,15 @@ const Users: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="small">
-          <Button 
-            type="text" 
-            icon={<EditOutlined />} 
+          <Button
+            type="text"
+            icon={<EditOutlined />}
             onClick={() => handleGroupAction('编辑', record)}
             title="编辑"
           />
-          <Button 
-            type="text" 
-            icon={<TeamOutlined />} 
+          <Button
+            type="text"
+            icon={<TeamOutlined />}
             onClick={() => handleGroupAction('管理成员', record)}
             title="管理成员"
           />
@@ -446,10 +464,10 @@ const Users: React.FC = () => {
             cancelText="取消"
             disabled={record.name === '管理员组'}
           >
-            <Button 
-              type="text" 
-              danger 
-              icon={<DeleteOutlined />} 
+            <Button
+              type="text"
+              danger
+              icon={<DeleteOutlined />}
               disabled={record.name === '管理员组'}
               title="删除"
             />
@@ -464,7 +482,7 @@ const Users: React.FC = () => {
     const activeUsers = userData.filter(user => user.status === 'active').length;
     const inactiveUsers = userData.filter(user => user.status === 'inactive').length;
     const lockedUsers = userData.filter(user => user.status === 'locked').length;
-    
+
     return (
       <Card style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', gap: 32 }}>
@@ -504,10 +522,10 @@ const Users: React.FC = () => {
               <Button icon={<ReloadOutlined />}>刷新</Button>
             </Space>
           </div>
-          
-          <Table 
-            columns={userColumns} 
-            dataSource={userData} 
+
+          <Table
+            columns={userColumns}
+            dataSource={userData}
             rowKey="id"
             pagination={{ pageSize: 10 }}
           />
@@ -534,10 +552,10 @@ const Users: React.FC = () => {
               <Button icon={<ReloadOutlined />}>刷新</Button>
             </Space>
           </div>
-          
-          <Table 
-            columns={groupColumns} 
-            dataSource={groupData} 
+
+          <Table
+            columns={groupColumns}
+            dataSource={groupData}
             rowKey="id"
             pagination={{ pageSize: 10 }}
           />
@@ -549,13 +567,13 @@ const Users: React.FC = () => {
   return (
     <div className="users-container">
       <h1>用户管理</h1>
-      
+
       {renderUserOverview()}
-      
+
       <Card>
         <Tabs defaultActiveKey="1" items={tabItems} />
       </Card>
-      
+
       {/* 创建/编辑用户表单 */}
       <Modal
         title={selectedUser ? '编辑用户' : '创建用户'}
@@ -568,7 +586,7 @@ const Users: React.FC = () => {
           form={userForm}
           layout="vertical"
           name="userForm"
-          initialValues={{ 
+          initialValues={{
             role: 'user',
             status: 'active',
           }}
@@ -579,28 +597,32 @@ const Users: React.FC = () => {
             rules={[
               { required: true, message: '请输入用户名' },
               { min: 3, message: '用户名至少3个字符' },
-              { pattern: /^[a-zA-Z0-9_]+$/, message: '用户名只能包含字母、数字和下划线' }
+              { pattern: /^[a-zA-Z0-9_]+$/, message: '用户名只能包含字母、数字和下划线' },
             ]}
           >
             <Input placeholder="请输入用户名" disabled={!!selectedUser} />
           </Form.Item>
-          
+
           {!selectedUser && (
             <Form.Item
               name="password"
               label="密码"
               rules={[
                 { required: true, message: '请输入密码' },
-                { min: 8, message: '密码至少8个字符' }
+                { min: 8, message: '密码至少8个字符' },
               ]}
             >
-              <Password 
-                placeholder="请输入密码" 
-                iconRender={visible => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)} 
+              <Password
+                placeholder="请输入密码"
+                iconRender={visible => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
+              />
+              <Password
+                placeholder="请输入密码"
+                iconRender={visible => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
               />
             </Form.Item>
           )}
-          
+
           {!selectedUser && (
             <Form.Item
               name="confirmPassword"
@@ -618,13 +640,13 @@ const Users: React.FC = () => {
                 }),
               ]}
             >
-              <Password 
-                placeholder="请确认密码" 
-                iconRender={visible => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)} 
+              <Password
+                placeholder="请确认密码"
+                iconRender={visible => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
               />
             </Form.Item>
           )}
-          
+
           <Form.Item
             name="realName"
             label="姓名"
@@ -632,46 +654,38 @@ const Users: React.FC = () => {
           >
             <Input placeholder="请输入姓名" />
           </Form.Item>
-          
+
           <Form.Item
             name="email"
             label="电子邮箱"
             rules={[
               { required: true, message: '请输入电子邮箱' },
-              { type: 'email', message: '请输入有效的电子邮箱地址' }
+              { type: 'email', message: '请输入有效的电子邮箱地址' },
             ]}
           >
             <Input placeholder="请输入电子邮箱" />
           </Form.Item>
-          
+
           <Form.Item
             name="phone"
             label="手机号码"
             rules={[
               { required: true, message: '请输入手机号码' },
-              { pattern: /^1[3-9]\d{9}$/, message: '请输入有效的手机号码' }
+              { pattern: /^1[3-9]\d{9}$/, message: '请输入有效的手机号码' },
             ]}
           >
             <Input placeholder="请输入手机号码" />
           </Form.Item>
-          
-          <Form.Item
-            name="role"
-            label="角色"
-            rules={[{ required: true, message: '请选择角色' }]}
-          >
+
+          <Form.Item name="role" label="角色" rules={[{ required: true, message: '请选择角色' }]}>
             <Select placeholder="请选择角色">
               <Option value="admin">管理员</Option>
               <Option value="operator">运维人员</Option>
               <Option value="user">普通用户</Option>
             </Select>
           </Form.Item>
-          
-          <Form.Item
-            name="status"
-            label="状态"
-            rules={[{ required: true, message: '请选择状态' }]}
-          >
+
+          <Form.Item name="status" label="状态" rules={[{ required: true, message: '请选择状态' }]}>
             <Select placeholder="请选择状态">
               <Option value="active">活跃</Option>
               <Option value="inactive">未激活</Option>
@@ -680,7 +694,7 @@ const Users: React.FC = () => {
           </Form.Item>
         </Form>
       </Modal>
-      
+
       {/* 创建用户组表单 */}
       <Modal
         title="创建用户组"
@@ -689,11 +703,7 @@ const Users: React.FC = () => {
         onCancel={handleGroupCancel}
         width={600}
       >
-        <Form
-          form={groupForm}
-          layout="vertical"
-          name="groupForm"
-        >
+        <Form form={groupForm} layout="vertical" name="groupForm">
           <Form.Item
             name="name"
             label="组名称"
@@ -701,24 +711,17 @@ const Users: React.FC = () => {
           >
             <Input placeholder="请输入组名称" />
           </Form.Item>
-          
-          <Form.Item
-            name="description"
-            label="描述"
-          >
+
+          <Form.Item name="description" label="描述">
             <Input.TextArea rows={3} placeholder="请输入组描述" />
           </Form.Item>
-          
+
           <Form.Item
             name="permissions"
             label="权限"
             rules={[{ required: true, message: '请选择至少一个权限' }]}
           >
-            <Select
-              mode="multiple"
-              placeholder="请选择权限"
-              style={{ width: '100%' }}
-            >
+            <Select mode="multiple" placeholder="请选择权限" style={{ width: '100%' }}>
               <Option value="system:all">系统管理权限（所有）</Option>
               <Option value="vm:all">虚拟机管理（所有）</Option>
               <Option value="vm:view">虚拟机查看</Option>
@@ -745,7 +748,7 @@ const Users: React.FC = () => {
           </Form.Item>
         </Form>
       </Modal>
-      
+
       {/* 修改密码表单 */}
       <Modal
         title={`修改密码 - ${selectedUser?.username}`}
@@ -754,25 +757,21 @@ const Users: React.FC = () => {
         onCancel={handlePasswordCancel}
         width={400}
       >
-        <Form
-          form={passwordForm}
-          layout="vertical"
-          name="passwordForm"
-        >
+        <Form form={passwordForm} layout="vertical" name="passwordForm">
           <Form.Item
             name="newPassword"
             label="新密码"
             rules={[
               { required: true, message: '请输入新密码' },
-              { min: 8, message: '密码至少8个字符' }
+              { min: 8, message: '密码至少8个字符' },
             ]}
           >
-            <Password 
-              placeholder="请输入新密码" 
-              iconRender={visible => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)} 
+            <Password
+              placeholder="请输入新密码"
+              iconRender={visible => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
             />
           </Form.Item>
-          
+
           <Form.Item
             name="confirmPassword"
             label="确认新密码"
@@ -789,17 +788,18 @@ const Users: React.FC = () => {
               }),
             ]}
           >
-            <Password 
-              placeholder="请确认新密码" 
-              iconRender={visible => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)} 
+            <Password
+              placeholder="请确认新密码"
+              iconRender={visible => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
             />
           </Form.Item>
-          
-          <Form.Item
-            name="forceReset"
-            valuePropName="checked"
-          >
-            <Switch checkedChildren="下次登录需要修改密码" unCheckedChildren="下次登录需要修改密码" defaultChecked />
+
+          <Form.Item name="forceReset" valuePropName="checked">
+            <Switch
+              checkedChildren="下次登录需要修改密码"
+              unCheckedChildren="下次登录需要修改密码"
+              defaultChecked
+            />
           </Form.Item>
         </Form>
       </Modal>
