@@ -107,7 +107,7 @@ export interface VMAlertThreshold {
 
 export const setVMAlertThreshold = async (threshold: VMAlertThreshold): Promise<boolean> => {
   try {
-    await http.post('/vm/alert-threshold', threshold);
+    await http.post('/vm/alert-threshold', threshold as unknown as Record<string, unknown>);
     message.success('设置警报阈值成功');
     return true;
   } catch (error) {

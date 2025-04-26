@@ -15,6 +15,7 @@ import {
   Typography,
   Avatar,
   Popconfirm,
+  TabsProps,
 } from 'antd';
 import {
   PlusOutlined,
@@ -29,6 +30,7 @@ import {
   EyeOutlined,
   EyeInvisibleOutlined,
 } from '@ant-design/icons';
+import type { ColumnsType } from 'antd/lib/table';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
