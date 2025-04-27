@@ -561,8 +561,6 @@ const VirtualMachines: React.FC = () => {
 
   return (
     <div className="virtual-machines-container">
-      <h1>虚拟机管理</h1>
-
       <Card>
         <Tabs defaultActiveKey="1" items={tabItems} />
       </Card>

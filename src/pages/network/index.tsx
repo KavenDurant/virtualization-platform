@@ -513,15 +513,24 @@ const Network: React.FC = () => {
     );
   };
 
+  // 渲染拓扑图
+  const renderTopology = () => {
+    return (
+      <div style={{ height: 300, backgroundColor: '#f0f0f0', borderRadius: 8 }}>
+        <Text>拓扑图展示区域</Text>
+      </div>
+    );
+  };
+
   return (
     <div className="network-container">
-      <h1>网络管理</h1>
-
       {renderNetworkOverview()}
 
-      <Card>
+      <Card style={{ marginBottom: 16 }}>
         <Tabs items={tabItems} />
       </Card>
+
+      <Card>{renderTopology()}</Card>
 
       {/* 创建网络表单 */}
       <Modal

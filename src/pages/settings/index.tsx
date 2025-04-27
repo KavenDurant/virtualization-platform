@@ -780,8 +780,6 @@ const Settings: React.FC = () => {
 
   return (
     <div className="settings-container">
-      <h1>系统设置</h1>
-
       <Card>
         <Tabs defaultActiveKey="1" items={items} type="card" />
       </Card>

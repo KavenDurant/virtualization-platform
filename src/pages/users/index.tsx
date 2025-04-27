@@ -568,8 +568,6 @@ const Users: React.FC = () => {
 
   return (
     <div className="users-container">
-      <h1>用户管理</h1>
-
       {renderUserOverview()}
 
       <Card>

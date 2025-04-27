@@ -476,8 +476,6 @@ const Storage: React.FC = () => {
 
   return (
     <div className="storage-container">
-      <h1>存储管理</h1>
-
       {renderStoragePoolOverview()}
 
       <Card>

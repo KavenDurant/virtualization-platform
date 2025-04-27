@@ -111,3 +111,16 @@ button {
   padding: 8px 15px;
   margin-bottom: 20px;
 }
+
+/* 防止整个页面滚动 */
+html,
+body {
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Content区域滚动样式 */
+.content-container {
+  overflow: auto;
+  height: calc(100vh - 64px); /* 88px = header(64px)  */
+}

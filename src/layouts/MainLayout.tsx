@@ -226,7 +226,16 @@ const MainLayout: React.FC = () => {
         </Sider>
       )}
       <Layout>
-        <Header style={{ padding: 0, background: colorBgContainer }}>
+        <Header
+          style={{
+            padding: 0,
+            background: colorBgContainer,
+            border: '1px solid #cccece',
+            position: 'sticky',
+            top: 0,
+            zIndex: 1,
+          }}
+        >
           <div className="header-container">
             {/* 非移动设备时显示折叠按钮 */}
             {!isMobile && (
@@ -275,11 +284,12 @@ const MainLayout: React.FC = () => {
         <Content
           className="content-container"
           style={{
-            margin: '24px 16px',
             padding: 24,
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
             minHeight: 280,
+            overflow: 'auto',
+            height: 'calc(100vh - 64px)', // 88px = header(64px) + margin(24px)
           }}
         >
           <div className="breadcrumb-container">
