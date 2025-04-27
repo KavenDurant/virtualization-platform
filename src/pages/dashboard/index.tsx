@@ -268,7 +268,7 @@ const Dashboard: React.FC = () => {
         setContextMenuPosition(newPosition);
       }
     }
-  }, [contextMenuVisible]);
+  }, [contextMenuVisible, contextMenuPosition]);
 
   // 右键菜单项
   const contextMenuItems: MenuProps['items'] = [
