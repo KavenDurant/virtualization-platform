@@ -9,8 +9,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { defineConfig as defineVitestConfig } from 'vitest/config';
 
-// https://vite.dev/config/
+// 结合 Vite 和 Vitest 配置
 export default defineConfig({
   plugins: [react()],
   css: {
@@ -28,11 +30,6 @@ export default defineConfig({
         },
       },
     },
-  },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './src/test/setup.ts',
   },
   resolve: {
     alias: {
@@ -60,5 +57,10 @@ export default defineConfig({
         drop_debugger: true,
       },
     },
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
   },
 });

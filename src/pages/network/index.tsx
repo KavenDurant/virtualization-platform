@@ -16,6 +16,7 @@ import {
   Switch,
   Divider,
   Tooltip,
+  message,
 } from 'antd';
 import {
   PlusOutlined,
@@ -28,6 +29,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { TabsProps } from 'antd';
+import NetworkTopology, { NetworkTopologyData } from '@/components/NetworkTopology';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -159,6 +161,179 @@ const Network: React.FC = () => {
       status: 'down',
     },
   ];
+
+  // 模拟拓扑图数据
+  const generateTopologyData = (): NetworkTopologyData => {
+    // 创建网络节点
+    const networkNodes = networkData.map(network => ({
+      id: `network-${network.id}`,
+      label: network.name,
+      title: `类型: ${
+        network.type === 'nat'
+          ? 'NAT'
+          : network.type === 'bridge'
+            ? '桥接'
+            : network.type === 'isolated'
+              ? '隔离'
+              : '直连'
+      }<br/>
+        子网: ${network.subnet || '无'}<br/>
+        网关: ${network.gateway || '无'}<br/>
+        DHCP: ${network.dhcp ? '启用' : '禁用'}<br/>
+        状态: ${
+          network.status === 'active' ? '活跃' : network.status === 'inactive' ? '未激活' : '错误'
+        }`,
+      group: 'network',
+    }));
+
+    // 创建路由器节点
+    const routerNode = {
+      id: 'router-1',
+      label: '主路由器',
+      title: 'IP: 192.168.1.1<br/>连接到外部网络',
+      group: 'router',
+    };
+
+    // 创建交换机节点
+    const switchNodes = [
+      {
+        id: 'switch-1',
+        label: '核心交换机',
+        title: '连接所有网络',
+        group: 'switch',
+      },
+      {
+        id: 'switch-2',
+        label: '生产交换机',
+        title: '连接生产网络',
+        group: 'switch',
+      },
+    ];
+
+    // 创建虚拟机节点
+    const vmNodes = interfaceData
+      .reduce((uniqueVMs, intf) => {
+        if (!uniqueVMs.some(vm => vm.vmName === intf.vmName)) {
+          uniqueVMs.push(intf);
+        }
+        return uniqueVMs;
+      }, [] as NetworkInterface[])
+      .map(vm => ({
+        id: `vm-${vm.id.split('-')[0]}`,
+        label: vm.vmName,
+        title: `${vm.vmName}<br/>IP: ${vm.ipAddress}<br/>状态: ${vm.status === 'up' ? '在线' : '离线'}`,
+        group: 'vm',
+      }));
+
+    // 创建所有节点的集合
+    const nodes = [...networkNodes, routerNode, ...switchNodes, ...vmNodes];
+
+    // 创建边（连接关系）
+    const edges: {
+      id: string;
+      from: string;
+      to: string;
+      width?: number;
+      title?: string;
+      arrows?: {
+        to: {
+          enabled: boolean;
+        };
+      };
+      dashes?: boolean;
+      color?:
+        | {
+            color: string;
+          }
+        | undefined;
+    }[] = [];
+
+    // 路由器连接到核心交换机
+    edges.push({
+      id: 'edge-router-switch',
+      from: 'router-1',
+      to: 'switch-1',
+      width: 3,
+      title: '上行链路',
+      arrows: {
+        to: { enabled: false },
+      },
+    });
+
+    // 交换机之间的连接
+    edges.push({
+      id: 'edge-switch-switch',
+      from: 'switch-1',
+      to: 'switch-2',
+      width: 2,
+      title: '交换机连接',
+      arrows: {
+        to: { enabled: false },
+      },
+    });
+
+    // 交换机到网络的连接
+    networkNodes.forEach(network => {
+      if (network.label.includes('生产')) {
+        edges.push({
+          id: `edge-switch2-${network.id}`,
+          from: 'switch-2',
+          to: network.id,
+          title: '网络连接',
+          arrows: {
+            to: { enabled: false },
+          },
+        });
+      } else {
+        edges.push({
+          id: `edge-switch1-${network.id}`,
+          from: 'switch-1',
+          to: network.id,
+          title: '网络连接',
+          arrows: {
+            to: { enabled: false },
+          },
+        });
+      }
+    });
+
+    // 虚拟机到网络的连接
+    interfaceData.forEach(intf => {
+      const networkNode = networkNodes.find(n => n.label === intf.network);
+      const vmNode = vmNodes.find(vm => vm.label === intf.vmName);
+
+      if (networkNode && vmNode) {
+        edges.push({
+          id: `edge-${vmNode.id}-${networkNode.id}`,
+          from: vmNode.id,
+          to: networkNode.id,
+          title: `网卡: ${intf.name}<br/>MAC: ${intf.mac}<br/>IP: ${intf.ipAddress}`,
+          dashes: intf.status === 'down',
+          color: intf.status === 'down' ? { color: '#f5222d' } : undefined,
+        });
+      }
+    });
+
+    return {
+      nodes,
+      edges,
+    };
+  };
+
+  // 生成拓扑图数据
+  const topologyData = generateTopologyData();
+
+  // 处理节点点击
+  const handleNodeClick = (nodeId: string) => {
+    console.log(`点击了节点: ${nodeId}`);
+    message.info(`选择了: ${nodeId}`);
+  };
+
+  // 处理边点击
+  const handleEdgeClick = (edgeId: string) => {
+    console.log(`点击了边: ${edgeId}`);
+    message.info(`选择了连接: ${edgeId}`);
+  };
 
   // 显示创建网络模态框
   const showNetworkModal = () => {
@@ -516,9 +691,11 @@ const Network: React.FC = () => {
   // 渲染拓扑图
   const renderTopology = () => {
     return (
-      <div style={{ height: 300, backgroundColor: '#f0f0f0', borderRadius: 8 }}>
-        <Text>拓扑图展示区域</Text>
-      </div>
+      <NetworkTopology
+        data={topologyData}
+        onNodeClick={handleNodeClick}
+        onEdgeClick={handleEdgeClick}
+      />
     );
   };
 

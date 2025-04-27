@@ -15,6 +15,7 @@ import {
   HomeOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
+import ScrollToTop from '@/components/ScrollToTop';
 import '../styles/layout.less';
 
 const { Header, Sider, Content } = Layout;
@@ -194,6 +195,9 @@ const MainLayout: React.FC = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
+      {/* 滚动恢复组件 */}
+      <ScrollToTop />
+
       {/* 非移动设备时显示侧边栏 */}
       {!isMobile && (
         <Sider
