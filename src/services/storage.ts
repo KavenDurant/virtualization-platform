@@ -45,7 +45,6 @@ export interface CreateStoragePoolParams {
 // 创建存储卷参数
 export interface CreateStorageVolumeParams {
   name: string;
-  poolId: string;
   size: number;
   format: 'qcow2' | 'raw' | 'vmdk';
   preallocation?: 'off' | 'metadata' | 'full';
@@ -76,18 +75,59 @@ export const getStoragePool = async (id: string): Promise<StoragePool | null> =>
   }
 };
 
+// 获取存储池详细信息（为了匹配测试中的命名）
+export const getStoragePoolDetails = async (id: string): Promise<StoragePool | null> => {
+  try {
+    const response = await http.get<StoragePool>(`/storage/pools/${id}`);
+    return response;
+  } catch (error) {
+    console.error('获取存储池详情失败:', error);
+    message.error('获取存储池详情失败');
+    return null;
+  }
+};
+
 // 创建存储池
 export const createStoragePool = async (
   params: CreateStoragePoolParams
 ): Promise<StoragePool | null> => {
   try {
-    const response = await http.post<StoragePool>('/storage/pools', params);
+    const response = await http.post<StoragePool>(
+      '/storage/pools',
+      params as unknown as Record<string, unknown>
+    );
     message.success('创建存储池成功');
     return response;
   } catch (error) {
     console.error('创建存储池失败:', error);
     message.error('创建存储池失败');
     return null;
+  }
+};
+
+// 启动存储池
+export const startStoragePool = async (id: string): Promise<boolean> => {
+  try {
+    await http.post(`/storage/pools/${id}/start`);
+    message.success('启动存储池成功');
+    return true;
+  } catch (error) {
+    console.error('启动存储池失败:', error);
+    message.error('启动存储池失败');
+    return false;
+  }
+};
+
+// 停止存储池
+export const stopStoragePool = async (id: string): Promise<boolean> => {
+  try {
+    await http.post(`/storage/pools/${id}/stop`);
+    message.success('停止存储池成功');
+    return true;
+  } catch (error) {
+    console.error('停止存储池失败:', error);
+    message.error('停止存储池失败');
+    return false;
   }
 };
 
@@ -131,9 +171,11 @@ export const deleteStoragePool = async (id: string): Promise<boolean> => {
 };
 
 // 获取存储卷列表
-export const getStorageVolumes = async (): Promise<StorageVolume[]> => {
+export const getStorageVolumes = async (poolId?: string): Promise<StorageVolume[]> => {
   try {
-    const response = await http.get<StorageVolume[]>('/storage/volumes');
+    // 根据测试预期修改，当提供poolId时，应该使用对应的API路径
+    const url = poolId ? `/storage/pools/${poolId}/volumes` : '/storage/volumes';
+    const response = await http.get<StorageVolume[]>(url);
     return response;
   } catch (error) {
     console.error('获取存储卷列表失败:', error);
@@ -168,10 +210,15 @@ export const getStorageVolume = async (id: string): Promise<StorageVolume | null
 
 // 创建存储卷
 export const createStorageVolume = async (
+  poolId: string,
   params: CreateStorageVolumeParams
 ): Promise<StorageVolume | null> => {
   try {
-    const response = await http.post<StorageVolume>('/storage/volumes', params);
+    // 根据测试预期修改API调用方式
+    const response = await http.post<StorageVolume>(
+      `/storage/pools/${poolId}/volumes`,
+      params as unknown as Record<string, unknown>
+    );
     message.success('创建存储卷成功');
     return response;
   } catch (error) {
@@ -260,19 +307,23 @@ export const uploadImage = async (
       formData.append('description', params.description);
     }
 
-    const response = await http.post<StorageVolume>('/storage/images/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      onUploadProgress: onProgress
-        ? progressEvent => {
-            const percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total!
-            );
-            onProgress(percentCompleted);
-          }
-        : undefined,
-    });
+    const response = await http.post<StorageVolume>(
+      '/storage/images/upload',
+      formData as unknown as Record<string, unknown>,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: onProgress
+          ? progressEvent => {
+              const percentCompleted = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total!
+              );
+              onProgress(percentCompleted);
+            }
+          : undefined,
+      }
+    );
 
     message.success('上传镜像成功');
     return response;

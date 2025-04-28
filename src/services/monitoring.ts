@@ -13,6 +13,124 @@ export interface VMPerformanceData {
   timestamp: number;
 }
 
+// 系统监控数据类型
+export interface SystemStats {
+  cpuUsage: number;
+  memoryUsage: number;
+  diskUsage: number;
+  networkBandwidth: number;
+  timestamp: number;
+}
+
+// 虚拟机监控数据类型
+export interface VirtualMachineStats {
+  vmId: string;
+  cpuUsage: number;
+  memoryUsage: number;
+  diskUsage: number;
+  networkUsage: number;
+  status: string;
+  timestamp: number;
+}
+
+// 告警信息类型
+export interface Alert {
+  id: string;
+  type: 'system' | 'vm';
+  resourceId?: string;
+  severity: 'info' | 'warning' | 'error' | 'critical';
+  message: string;
+  timestamp: number;
+  acknowledged: boolean;
+}
+
+// 获取系统监控数据
+export const getSystemStats = async (): Promise<SystemStats | null> => {
+  try {
+    const response = await http.get<SystemStats>('/monitoring/system');
+    return response;
+  } catch (error) {
+    console.error('获取系统监控数据失败:', error);
+    message.error('获取系统监控数据失败');
+    return null;
+  }
+};
+
+// 获取虚拟机监控数据
+export const getVirtualMachineStats = async (vmId: string): Promise<VirtualMachineStats | null> => {
+  try {
+    const response = await http.get<VirtualMachineStats>(`/monitoring/vm/${vmId}`);
+    return response;
+  } catch (error) {
+    console.error('获取虚拟机监控数据失败:', error);
+    message.error('获取虚拟机监控数据失败');
+    return null;
+  }
+};
+
+// 获取告警信息
+export const getAlerts = async (): Promise<Alert[]> => {
+  try {
+    const response = await http.get<Alert[]>('/monitoring/alerts');
+    return response;
+  } catch (error) {
+    console.error('获取告警信息失败:', error);
+    message.error('获取告警信息失败');
+    return [];
+  }
+};
+
+// 确认告警
+export const acknowledgeAlert = async (alertId: string): Promise<boolean> => {
+  try {
+    await http.post(`/monitoring/alerts/${alertId}/acknowledge`);
+    message.success('确认告警成功');
+    return true;
+  } catch (error) {
+    console.error('确认告警失败:', error);
+    message.error('确认告警失败');
+    return false;
+  }
+};
+
+// 主机性能历史数据类型
+export interface HostPerformanceData {
+  timestamp: number;
+  value: number;
+}
+
+// 获取主机性能历史数据
+export const getHostPerformanceHistory = async (params: {
+  metric: string;
+  timeRange: string;
+}): Promise<HostPerformanceData[]> => {
+  try {
+    const response = await http.get<HostPerformanceData[]>('/monitoring/history/host', { params });
+    return response;
+  } catch (error) {
+    console.error('获取主机性能历史数据失败:', error);
+    message.error('获取主机性能历史数据失败');
+    return [];
+  }
+};
+
+// 获取虚拟机性能历史数据
+export const getVmPerformanceHistory = async (
+  vmId: string,
+  params: { metric: string; timeRange: string }
+): Promise<VMPerformanceData[]> => {
+  try {
+    const response = await http.get<VMPerformanceData[]>(`/monitoring/history/vm/${vmId}`, {
+      params,
+    });
+    return response;
+  } catch (error) {
+    console.error('获取虚拟机性能历史数据失败:', error);
+    message.error('获取虚拟机性能历史数据失败');
+    return [];
+  }
+};
+
 // 获取单个虚拟机的实时性能数据
 export const getVMRealTimePerformance = async (vmId: string): Promise<VMPerformanceData> => {
   try {
@@ -68,7 +186,7 @@ export const getVMHistoricalPerformance = async (
     const response = await http.get<VMPerformanceData[]>(`/vm/${vmId}/historical-performance`, {
       params: { startTime, endTime, interval },
     });
-    return response;
+    return response as VMPerformanceData[];
   } catch (error) {
     console.error('获取虚拟机历史性能数据失败:', error);
     message.error('获取虚拟机历史性能数据失败');

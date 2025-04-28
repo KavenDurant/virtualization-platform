@@ -1,6 +1,6 @@
+import { NetworkTopologyData } from '@/components/NetworkTopology';
 import { message } from 'antd';
 import http from './http';
-import { NetworkTopologyData } from '@/components/NetworkTopology';
 
 // 定义拓扑图节点类型
 export interface TopologyNode {
@@ -149,7 +149,10 @@ export const getNetwork = async (id: string): Promise<Network | null> => {
 // 创建网络
 export const createNetwork = async (params: CreateNetworkParams): Promise<Network | null> => {
   try {
-    const response = await http.post<Network>('/network', params);
+    const response = await http.post<Network>(
+      '/network',
+      params as unknown as Record<string, unknown>
+    );
     message.success('创建网络成功');
     return response;
   } catch (error) {
@@ -211,7 +214,7 @@ export interface UpdateNetworkParams {
 // 编辑网络
 export const updateNetwork = async (params: UpdateNetworkParams): Promise<boolean> => {
   try {
-    await http.put(`/network/${params.id}`, params);
+    await http.put(`/network/${params.id}`, params as unknown as Record<string, unknown>);
     message.success('更新网络成功');
     return true;
   } catch (error) {
@@ -250,7 +253,10 @@ export const createNetworkInterface = async (
   params: CreateNetworkInterfaceParams
 ): Promise<NetworkInterface | null> => {
   try {
-    const response = await http.post<NetworkInterface>('/network/interfaces', params);
+    const response = await http.post<NetworkInterface>(
+      '/network/interfaces',
+      params as unknown as Record<string, unknown>
+    );
     message.success('创建网卡成功');
     return response;
   } catch (error) {
@@ -312,7 +318,10 @@ export const updateNetworkInterface = async (
   params: UpdateNetworkInterfaceParams
 ): Promise<boolean> => {
   try {
-    await http.put(`/network/interfaces/${params.id}`, params);
+    await http.put(
+      `/network/interfaces/${params.id}`,
+      params as unknown as Record<string, unknown>
+    );
     message.success('更新网卡成功');
     return true;
   } catch (error) {

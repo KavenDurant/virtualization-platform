@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,less}\"",
+    "format-all": "node scripts/format-all.js",
     "prepare": "husky",
     "test": "vitest run",
     "test:watch": "vitest",
