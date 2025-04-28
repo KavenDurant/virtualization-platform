@@ -33,7 +33,6 @@ import NetworkTopology, { NetworkTopologyData } from '@/components/NetworkTopolo
 
 const { Option } = Select;
 const { Title, Text } = Typography;
-
 // 网络类型定义
 interface Network {
   id: string;
@@ -62,6 +61,7 @@ interface NetworkInterface {
 }
 
 const Network: React.FC = () => {
+  const [messageApi, contextHolder] = message.useMessage();
   const [isNetworkModalVisible, setIsNetworkModalVisible] = useState(false);
   const [networkForm] = Form.useForm();
 
@@ -132,7 +132,7 @@ const Network: React.FC = () => {
     {
       id: '2',
       name: 'eth0',
-      vmName: '数据库服务器-01',
+      vmName: '数据库服务器-02',
       mac: '52:54:00:12:34:57',
       network: '生产网络',
       type: 'virtio',
@@ -142,7 +142,7 @@ const Network: React.FC = () => {
     {
       id: '3',
       name: 'eth1',
-      vmName: '数据库服务器-01',
+      vmName: '数据库服务器-03',
       mac: '52:54:00:12:34:58',
       network: '隔离网络',
       type: 'virtio',
@@ -153,7 +153,7 @@ const Network: React.FC = () => {
     {
       id: '4',
       name: 'eth0',
-      vmName: '测试服务器-01',
+      vmName: '测试服务器-04',
       mac: '52:54:00:12:34:59',
       network: '默认网络',
       type: 'e1000',
@@ -326,13 +326,13 @@ const Network: React.FC = () => {
   // 处理节点点击
   const handleNodeClick = (nodeId: string) => {
     console.log(`点击了节点: ${nodeId}`);
-    message.info(`选择了: ${nodeId}`);
+    messageApi.info(`选择了: ${nodeId}`);
   };
 
   // 处理边点击
   const handleEdgeClick = (edgeId: string) => {
     console.log(`点击了边: ${edgeId}`);
-    message.info(`选择了连接: ${edgeId}`);
+    messageApi.info(`选择了连接: ${edgeId}`);
   };
 
   // 显示创建网络模态框
@@ -702,7 +702,9 @@ const Network: React.FC = () => {
   return (
     <div className="network-container">
       {renderNetworkOverview()}
+      {contextHolder}
 
+      {/* 标签页 */}
       <Card style={{ marginBottom: 16 }}>
         <Tabs items={tabItems} />
       </Card>
