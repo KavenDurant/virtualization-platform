@@ -288,13 +288,14 @@ const Storage: React.FC = () => {
       render: (_, record) => {
         const usagePercentage = Math.round((record.usedCapacity / record.totalCapacity) * 100);
         return (
-          <div>
+          <div style={{ lineHeight: '1.2', display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <Progress
               percent={usagePercentage}
               size="small"
               status={usagePercentage > 80 ? 'exception' : undefined}
+              style={{ marginBottom: '2px' }}
             />
-            <div>
+            <div style={{ fontSize: '12px' }}>
               {record.usedCapacity} GB / {record.totalCapacity} GB
             </div>
           </div>

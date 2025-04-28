@@ -1,3 +1,11 @@
+/*
+ * @Author: KavenDurant luojiaxin888@gmail.com
+ * @Date: 2025-04-27 09:06:01
+ * @LastEditors: KavenDurant luojiaxin888@gmail.com
+ * @LastEditTime: 2025-04-28 11:38:38
+ * @FilePath: /virtualization-platform/src/routers/routes.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { lazy } from 'react';
 import { Navigate, RouteObject } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
@@ -12,6 +20,7 @@ const UserManagement = lazy(() => import('@/pages/users'));
 const Settings = lazy(() => import('@/pages/settings'));
 const Login = lazy(() => import('@/pages/login'));
 const NotFound = lazy(() => import('@/pages/404'));
+const ServerError = lazy(() => import('@/pages/500'));
 
 // 路由配置
 const routes: RouteObject[] = [
@@ -46,6 +55,10 @@ const routes: RouteObject[] = [
       {
         path: '/settings',
         element: LazyLoad(Settings),
+      },
+      {
+        path: '/500',
+        element: LazyLoad(ServerError),
       },
       {
         path: '*',

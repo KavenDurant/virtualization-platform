@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
 import { Skeleton, Card, Row, Col } from 'antd';
+import ErrorBoundary from './ErrorBoundary';
 
 // 通用骨架屏
 const GenericSkeleton: React.FC = () => (
@@ -181,9 +182,11 @@ const LazyLoad = (
   };
 
   return (
-    <Suspense fallback={getSkeletonByPathname(getDefaultPathname())}>
-      <Component />
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={getSkeletonByPathname(getDefaultPathname())}>
+        <Component />
+      </Suspense>
+    </ErrorBoundary>
   );
 };
 
