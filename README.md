@@ -163,16 +163,248 @@
 
 #### vis-network & vis-data (`vis-network`, `vis-data`)
 
-- **用途**：网络可视化
+- **用途**：网络可视化库，用于创建交互式网络图和拓扑图
+- **官方网站**：https://visjs.org/ (总项目)
+- **GitHub仓库**：
+  - vis-data: https://github.com/visjs/vis-data
+  - vis-network: https://github.com/visjs/vis-network
 - **优点**：
-  - 专为网络和拓扑图设计
-  - 支持交互式拖拽
-  - 高度可定制的外观
+  - 专为网络和拓扑图设计，非常适合虚拟化平台的网络拓扑展示
+  - 支持交互式拖拽、缩放和调整
+  - 高度可定制的外观和行为
   - 适合复杂网络关系展示
+  - 支持大规模数据集的高性能渲染
+  - 丰富的事件API，支持用户交互
 - **重要配置**：
-  - 节点和边的配置
-  - 物理引擎参数
-  - 交互选项
+  - 节点配置（nodes）：定义网络图中的节点外观和行为
+  - 边配置（edges）：定义节点之间的连接线外观和行为
+  - 物理引擎参数：控制节点的布局和移动行为
+  - 交互选项：控制用户与图表的交互方式
+
+### vis.js网络图教程
+
+在我们的虚拟化平台中，vis-network和vis-data主要用于展示虚拟机、物理服务器和网络设备之间的连接关系，以可视化方式呈现网络拓扑。以下是使用这些库的基本指南：
+
+#### 1. 安装
+
+```bash
+# 已在项目中安装
+npm install vis-data vis-network
+```
+
+#### 2. 基本用法
+
+```tsx
+import { DataSet } from 'vis-data';
+import { Network } from 'vis-network';
+import React, { useEffect, useRef } from 'react';
+
+const NetworkTopology: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    // 创建节点数据集
+    const nodes = new DataSet([
+      { id: 1, label: '虚拟机1', group: 'vm' },
+      { id: 2, label: '虚拟机2', group: 'vm' },
+      { id: 3, label: '物理服务器', group: 'host' },
+      { id: 4, label: '交换机', group: 'network' },
+    ]);
+
+    // 创建边数据集
+    const edges = new DataSet([
+      { from: 1, to: 3 },
+      { from: 2, to: 3 },
+      { from: 3, to: 4 },
+    ]);
+
+    // 配置选项
+    const options = {
+      nodes: {
+        shape: 'box',
+        font: {
+          size: 14,
+        },
+        borderWidth: 2,
+      },
+      groups: {
+        vm: { color: { background: '#D2E5FF', border: '#2B7CE9' } },
+        host: { color: { background: '#FFC0CB', border: '#FF69B4' } },
+        network: { color: { background: '#C2FABC', border: '#4CAF50' } },
+      },
+      physics: {
+        stabilization: true,
+        barnesHut: {
+          gravitationalConstant: -10000,
+          springConstant: 0.04,
+          springLength: 95,
+        },
+      },
+      layout: {
+        hierarchical: {
+          direction: 'UD', // 上下方向布局
+          sortMethod: 'directed',
+        },
+      },
+    };
+
+    // 创建网络图
+    const network = new Network(containerRef.current, { nodes, edges }, options);
+
+    // 事件监听示例
+    network.on('click', params => {
+      if (params.nodes.length > 0) {
+        const nodeId = params.nodes[0];
+        console.log('点击了节点:', nodeId);
+        // 这里可以添加节点点击处理逻辑
+      }
+    });
+
+    return () => {
+      network.destroy(); // 清理
+    };
+  }, []);
+
+  return <div ref={containerRef} style={{ height: '500px', width: '100%' }} />;
+};
+
+export default NetworkTopology;
+```
+
+#### 3. 高级用法
+
+##### 自定义节点外观
+
+```tsx
+const nodes = new DataSet([
+  {
+    id: 1,
+    label: '虚拟机1',
+    shape: 'image',
+    image: '/images/vm-icon.png',
+    size: 30,
+    title: '双击查看详情', // 悬停提示
+  },
+  // ...other nodes
+]);
+```
+
+##### 自定义边样式
+
+```tsx
+const edges = new DataSet([
+  {
+    from: 1,
+    to: 3,
+    color: { color: '#ff0000', highlight: '#00ff00' },
+    width: 2,
+    dashes: [5, 5], // 虚线样式
+    arrows: { to: { enabled: true } }, // 箭头
+    label: '连接',
+  },
+  // ...other edges
+]);
+```
+
+##### 动态更新
+
+```tsx
+// 添加新节点
+nodes.add({ id: 5, label: '新虚拟机', group: 'vm' });
+
+// 更新节点
+nodes.update({ id: 1, label: '更新的标签', color: { background: 'yellow' } });
+
+// 删除节点
+nodes.remove(2);
+
+// 类似地可以操作边
+edges.add({ from: 5, to: 3 });
+```
+
+#### 4. 常用配置项说明
+
+```tsx
+const options = {
+  // 节点配置
+  nodes: {
+    shape: 'dot', // 可选: ellipse, circle, box, diamond, dot, star, triangle, triangleDown, square
+    size: 20, // 节点大小
+    font: {
+      size: 14, // 字体大小
+      color: '#343434', // 字体颜色
+      face: 'Arial', // 字体
+    },
+    borderWidth: 2, // 边框宽度
+    shadow: true, // 是否有阴影
+  },
+
+  // 边配置
+  edges: {
+    width: 2, // 线宽
+    color: { color: '#848484', highlight: '#1890ff' }, // 颜色
+    arrows: {
+      // 箭头
+      to: { enabled: true, scaleFactor: 1 },
+    },
+    smooth: {
+      // 平滑曲线
+      type: 'continuous',
+      roundness: 0.5,
+    },
+  },
+
+  // 物理引擎配置
+  physics: {
+    enabled: true, // 启用物理引擎
+    barnesHut: {
+      // Barnes-Hut算法配置
+      gravitationalConstant: -2000, // 引力常数
+      centralGravity: 0.3, // 中心引力
+      springLength: 95, // 弹簧长度
+      springConstant: 0.04, // 弹簧常数
+      damping: 0.09, // 阻尼
+    },
+    stabilization: {
+      // 稳定化配置
+      enabled: true,
+      iterations: 1000, // 稳定化迭代次数
+      updateInterval: 50, // 更新间隔
+    },
+  },
+
+  // 交互配置
+  interaction: {
+    dragNodes: true, // 允许拖拽节点
+    dragView: true, // 允许拖拽视图
+    zoomView: true, // 允许缩放
+    navigationButtons: true, // 显示导航按钮
+    keyboard: {
+      // 键盘支持
+      enabled: true,
+      speed: { x: 10, y: 10, zoom: 0.02 },
+    },
+  },
+};
+```
+
+#### 5. 在虚拟化平台中的应用
+
+在我们的项目中，vis-network主要用于展示:
+
+- 虚拟机与物理主机的部署关系
+- 网络设备之间的连接拓扑
+- 存储资源与虚拟机的挂载关系
+- 负载均衡和故障转移路径
+
+通过可视化网络拓扑，管理员可以直观地理解虚拟化环境中的资源关系，更高效地进行管理和故障排查。
+
+更多详细信息和API参考，请访问官方文档:
+
+- vis-network文档: https://visjs.github.io/vis-network/docs/network/
+- vis-data文档: https://visjs.github.io/vis-data/data/dataset.html
 
 ### 6. 工具库
 
