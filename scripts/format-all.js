@@ -1,8 +1,13 @@
 #!/usr/bin/env node
 
-const { execSync } = require('child_process');
-const path = require('path');
+import { execSync } from 'child_process';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+// 获取当前文件的路径
+const __filename = fileURLToPath(import.meta.url);
+// 获取当前文件的目录
+const __dirname = path.dirname(__filename);
 // 项目根目录
 const rootDir = path.resolve(__dirname, '..');
 
