@@ -1,32 +1,32 @@
-import React, { useState } from 'react';
 import {
-  Table,
-  Card,
-  Button,
-  Space,
-  Tag,
-  Progress,
-  Modal,
-  Form,
-  Input,
-  InputNumber,
-  Select,
-  Tabs,
-  Badge,
-  Typography,
-  Tooltip,
-} from 'antd';
-import {
-  PlusOutlined,
-  ReloadOutlined,
+  CloudUploadOutlined,
   DeleteOutlined,
   EditOutlined,
   HddOutlined,
   InboxOutlined,
-  CloudUploadOutlined,
+  PlusOutlined,
   QuestionCircleOutlined,
+  ReloadOutlined,
 } from '@ant-design/icons';
+import {
+  Badge,
+  Button,
+  Card,
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  Progress,
+  Select,
+  Space,
+  Table,
+  Tabs,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+import React, { useState } from 'react';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -509,6 +509,7 @@ const Storage: React.FC = () => {
                     dataSource={poolData}
                     rowKey="id"
                     pagination={{ pageSize: 10 }}
+                    scroll={{ x: 'max-content' }}
                   />
                 </>
               ),
@@ -540,6 +541,7 @@ const Storage: React.FC = () => {
                     dataSource={volumeData}
                     rowKey="id"
                     pagination={{ pageSize: 10 }}
+                    scroll={{ x: 'max-content' }}
                   />
                 </>
               ),

@@ -1,21 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Layout, Menu, theme, Dropdown, Avatar, Button, Drawer, Breadcrumb } from 'antd';
+import ScrollToTop from '@/components/ScrollToTop';
 import {
+  AlertOutlined,
+  AppstoreOutlined,
+  BellOutlined,
+  ClusterOutlined,
   DashboardOutlined,
-  DesktopOutlined,
   DatabaseOutlined,
+  DesktopOutlined,
   GlobalOutlined,
-  UserOutlined,
-  SettingOutlined,
+  HomeOutlined,
+  LineChartOutlined,
+  LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  LogoutOutlined,
-  BellOutlined,
-  AppstoreOutlined,
-  HomeOutlined,
+  SafetyCertificateOutlined,
+  SettingOutlined,
+  SyncOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
-import { useNavigate, Outlet, useLocation } from 'react-router-dom';
-import ScrollToTop from '@/components/ScrollToTop';
+import { Avatar, Breadcrumb, Button, Drawer, Dropdown, Layout, Menu, theme } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import '../styles/layout.less';
 
 const { Header, Sider, Content } = Layout;
@@ -76,6 +81,33 @@ const MainLayout: React.FC = () => {
       label: '网络管理',
     },
     {
+      key: '/cluster',
+      icon: <ClusterOutlined />,
+      label: '集群管理',
+      children: [
+        {
+          key: '/cluster/monitoring',
+          icon: <LineChartOutlined />,
+          label: '集群状态监控',
+        },
+        {
+          key: '/cluster/failover',
+          icon: <SafetyCertificateOutlined />,
+          label: '故障转移策略',
+        },
+        {
+          key: '/cluster/alerts',
+          icon: <AlertOutlined />,
+          label: '告警与通知',
+        },
+        {
+          key: '/cluster/config',
+          icon: <SyncOutlined />,
+          label: '配置同步备份',
+        },
+      ],
+    },
+    {
       key: '/users',
       icon: <UserOutlined />,
       label: '用户管理',
@@ -90,13 +122,23 @@ const MainLayout: React.FC = () => {
   // 根据当前路径生成面包屑项
   const getBreadcrumbItems = () => {
     // 将菜单项转换为映射，方便查找
-    const menuMap = menuItems.reduce(
-      (acc, item) => {
-        acc[item.key] = item.label;
-        return acc;
-      },
-      {} as Record<string, string>
-    );
+    const menuMap: Record<string, string> = {};
+
+    interface MenuItem {
+      key: string;
+      label: string;
+      children?: MenuItem[];
+    }
+
+    const processMenuItems = (items: MenuItem[]) => {
+      items.forEach(item => {
+        menuMap[item.key] = item.label;
+        if (item.children) {
+          processMenuItems(item.children);
+        }
+      });
+    };
+    processMenuItems(menuItems);
 
     // 如果是首页或仪表盘
     if (location.pathname === '/' || location.pathname === '/dashboard') {

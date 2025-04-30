@@ -1,29 +1,37 @@
-import React, { useState } from 'react';
 import {
-  Table,
-  Card,
+  DatabaseOutlined,
+  DeleteOutlined,
+  DesktopOutlined,
+  EditOutlined,
+  PauseCircleOutlined,
+  PlayCircleOutlined,
+  PlusOutlined,
+  PoweroffOutlined,
+  ReloadOutlined,
+} from '@ant-design/icons';
+import type { TabsProps } from 'antd';
+import {
+  App,
+  Badge,
   Button,
-  Space,
-  Tag,
-  Modal,
+  Card,
+  Col,
   Form,
   Input,
-  Select,
   InputNumber,
+  Modal,
+  Progress,
+  Row,
+  Select,
+  Space,
+  Statistic,
+  Table,
   Tabs,
-  Badge,
+  Tag,
+  message,
 } from 'antd';
-import {
-  PlusOutlined,
-  ReloadOutlined,
-  PlayCircleOutlined,
-  PauseCircleOutlined,
-  PoweroffOutlined,
-  DeleteOutlined,
-  EditOutlined,
-} from '@ant-design/icons';
-import type { ColumnsType } from 'antd/es/table';
-import type { TabsProps } from 'antd';
+import type { ColumnsType, TableProps } from 'antd/es/table';
+import React, { useEffect, useState } from 'react';
 
 const { Option } = Select;
 
@@ -41,7 +49,43 @@ interface VirtualMachine {
 
 const VirtualMachines: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [form] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
+  // 添加表格大小的状态
+  const [tableSize, setTableSize] = useState<TableProps<VirtualMachine>['size']>('middle');
+
+  // 定义行选择配置
+  const rowSelections = {
+    selectedRowKeys,
+    onChange: (selectedKeys: React.Key[]) => {
+      setSelectedRowKeys(selectedKeys);
+    },
+  };
+
+  // 监听窗口大小变化
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setTableSize('small'); // 在小屏幕上使用小尺寸
+      } else if (window.innerWidth <= 1200) {
+        setTableSize('middle'); // 在中等屏幕上使用中等尺寸
+      } else {
+        setTableSize('large'); // 在大屏幕上使用大尺寸
+      }
+    };
+
+    // 初始调用一次设置初始值
+    handleResize();
+
+    // 添加窗口大小变化的监听器
+    window.addEventListener('resize', handleResize);
+
+    // 清理函数
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   // 模拟数据
   const data: VirtualMachine[] = [
@@ -377,7 +421,22 @@ const VirtualMachines: React.FC = () => {
     },
   ];
 
+  // 统计数据（实际应用中应该从API获取）
+  const statsData = {
+    totalVMs: 30,
+    runningVMs: 18,
+    stoppedVMs: 7,
+    pausedVMs: 3,
+    errorVMs: 2,
+    totalStorage: 8240, // GB
+    cpuUsage: 57, // 百分比
+    memoryUsage: 64, // 百分比
+  };
+
   const showModal = () => {
+    messageApi.success({
+      content: '创建虚拟机成功',
+    });
     setIsModalVisible(true);
   };
 
@@ -527,13 +586,82 @@ const VirtualMachines: React.FC = () => {
       key: '1',
       label: (
         <span>
-          <Badge count={2} offset={[10, 0]}>
+          <Badge count={statsData.errorVMs} offset={[10, 0]}>
             全部虚拟机
           </Badge>
         </span>
       ),
       children: (
         <>
+          {/* 添加统计卡片 - 与仪表盘相似的响应式设计 */}
+          <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+            <Col xs={24} sm={12} md={6}>
+              <Card variant="borderless">
+                <Statistic
+                  title="虚拟机总数"
+                  value={statsData.totalVMs}
+                  prefix={<DesktopOutlined />}
+                  valueStyle={{ color: '#1890ff' }}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Card variant="borderless">
+                <Statistic
+                  title="运行中"
+                  value={statsData.runningVMs}
+                  prefix={<PlayCircleOutlined />}
+                  valueStyle={{ color: '#52c41a' }}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Card variant="borderless">
+                <Statistic
+                  title="已停止"
+                  value={statsData.stoppedVMs}
+                  prefix={<PoweroffOutlined />}
+                  valueStyle={{ color: '#8c8c8c' }}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Card variant="borderless">
+                <Statistic
+                  title="总存储容量"
+                  value={(statsData.totalStorage / 1000).toFixed(1)}
+                  suffix="TB"
+                  prefix={<DatabaseOutlined />}
+                  valueStyle={{ color: '#722ed1' }}
+                />
+              </Card>
+            </Col>
+          </Row>
+
+          {/* 资源使用情况 */}
+          <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+            <Col xs={24} md={12}>
+              <Card title="CPU使用率" variant="borderless">
+                <div style={{ textAlign: 'center' }}>
+                  <Progress type="dashboard" percent={statsData.cpuUsage} />
+                  <div style={{ marginTop: 10 }}>总使用率: {statsData.cpuUsage}%</div>
+                </div>
+              </Card>
+            </Col>
+            <Col xs={24} md={12}>
+              <Card title="内存使用率" variant="borderless">
+                <div style={{ textAlign: 'center' }}>
+                  <Progress
+                    type="dashboard"
+                    percent={statsData.memoryUsage}
+                    strokeColor={statsData.memoryUsage > 80 ? '#ff4d4f' : '#faad14'}
+                  />
+                  <div style={{ marginTop: 10 }}>总使用率: {statsData.memoryUsage}%</div>
+                </div>
+              </Card>
+            </Col>
+          </Row>
+
           <div className="table-operations">
             <Space style={{ marginBottom: 16 }}>
               <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
@@ -543,7 +671,16 @@ const VirtualMachines: React.FC = () => {
             </Space>
           </div>
 
-          <Table columns={columns} dataSource={data} rowKey="id" pagination={{ pageSize: 10 }} />
+          <Table
+            columns={columns}
+            dataSource={data}
+            rowKey="id"
+            pagination={{ pageSize: 10 }}
+            size={tableSize}
+            scroll={{ x: 'max-content' }}
+            tableLayout="fixed"
+            rowSelection={rowSelections} // 添加行选择配置
+          />
         </>
       ),
     },
@@ -560,93 +697,104 @@ const VirtualMachines: React.FC = () => {
   ];
 
   return (
-    <div className="virtual-machines-container">
-      <Card>
-        <Tabs defaultActiveKey="1" items={tabItems} />
-      </Card>
+    <App>
+      <div className="virtual-machines-container">
+        {contextHolder}
+        <Card>
+          <Tabs defaultActiveKey="1" items={tabItems} />
+        </Card>
 
-      {/* 创建虚拟机表单 */}
-      <Modal
-        title="创建虚拟机"
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        width={600}
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          name="createVirtualMachineForm"
-          initialValues={{
-            os: 'CentOS 8',
-            cpu: 2,
-            memory: 4,
-            storage: 50,
+        {/* 创建虚拟机表单 */}
+        <Modal
+          title="创建虚拟机"
+          open={isModalVisible}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          width={600}
+          // 在移动设备上使用全屏模式
+          style={{ maxWidth: '100vw', margin: 0 }}
+          // 移动设备上底部按钮使用固定位置
+          bodyStyle={{
+            maxHeight: 'calc(100vh - 200px)',
+            overflow: 'auto',
           }}
+          centered
         >
-          <Form.Item
-            name="name"
-            label="虚拟机名称"
-            rules={[{ required: true, message: '请输入虚拟机名称' }]}
+          <Form
+            form={form}
+            layout="vertical"
+            name="createVirtualMachineForm"
+            initialValues={{
+              os: 'CentOS 8',
+              cpu: 2,
+              memory: 4,
+              storage: 50,
+            }}
           >
-            <Input placeholder="请输入虚拟机名称" />
-          </Form.Item>
+            <Form.Item
+              name="name"
+              label="虚拟机名称"
+              rules={[{ required: true, message: '请输入虚拟机名称' }]}
+            >
+              <Input placeholder="请输入虚拟机名称" />
+            </Form.Item>
 
-          <Form.Item
-            name="os"
-            label="操作系统"
-            rules={[{ required: true, message: '请选择操作系统' }]}
-          >
-            <Select placeholder="请选择操作系统">
-              <Option value="CentOS 8">CentOS 8</Option>
-              <Option value="Ubuntu 20.04">Ubuntu 20.04</Option>
-              <Option value="Debian 11">Debian 11</Option>
-              <Option value="Windows Server 2019">Windows Server 2019</Option>
-            </Select>
-          </Form.Item>
+            <Form.Item
+              name="os"
+              label="操作系统"
+              rules={[{ required: true, message: '请选择操作系统' }]}
+            >
+              <Select placeholder="请选择操作系统">
+                <Option value="CentOS 8">CentOS 8</Option>
+                <Option value="Ubuntu 20.04">Ubuntu 20.04</Option>
+                <Option value="Debian 11">Debian 11</Option>
+                <Option value="Windows Server 2019">Windows Server 2019</Option>
+              </Select>
+            </Form.Item>
 
-          <Form.Item
-            name="cpu"
-            label="CPU核心数"
-            rules={[{ required: true, message: '请输入CPU核心数' }]}
-          >
-            <InputNumber min={1} max={32} style={{ width: '100%' }} />
-          </Form.Item>
+            <Form.Item
+              name="cpu"
+              label="CPU核心数"
+              rules={[{ required: true, message: '请输入CPU核心数' }]}
+            >
+              <InputNumber min={1} max={32} style={{ width: '100%' }} />
+            </Form.Item>
 
-          <Form.Item
-            name="memory"
-            label="内存大小(GB)"
-            rules={[{ required: true, message: '请输入内存大小' }]}
-          >
-            <InputNumber min={1} max={128} style={{ width: '100%' }} />
-          </Form.Item>
+            <Form.Item
+              name="memory"
+              label="内存大小(GB)"
+              rules={[{ required: true, message: '请输入内存大小' }]}
+            >
+              <InputNumber min={1} max={128} style={{ width: '100%' }} />
+            </Form.Item>
 
-          <Form.Item
-            name="storage"
-            label="存储容量(GB)"
-            rules={[{ required: true, message: '请输入存储容量' }]}
-          >
-            <InputNumber min={10} max={1000} style={{ width: '100%' }} />
-          </Form.Item>
+            <Form.Item
+              name="storage"
+              label="存储容量(GB)"
+              rules={[{ required: true, message: '请输入存储容量' }]}
+            >
+              <InputNumber min={10} max={1000} style={{ width: '100%' }} />
+            </Form.Item>
 
-          <Form.Item
-            name="network"
-            label="网络设置"
-            rules={[{ required: true, message: '请选择网络设置' }]}
-          >
-            <Select placeholder="请选择网络设置">
-              <Option value="default">默认网络</Option>
-              <Option value="isolated">隔离网络</Option>
-              <Option value="custom">自定义</Option>
-            </Select>
-          </Form.Item>
+            <Form.Item
+              name="network"
+              label="网络设置"
+              rules={[{ required: true, message: '请选择网络设置' }]}
+            >
+              <Select placeholder="请选择网络设置">
+                <Option value="default">默认网络</Option>
+                <Option value="isolated">隔离网络</Option>
+                <Option value="custom">自定义</Option>
+              </Select>
+            </Form.Item>
 
-          <Form.Item name="description" label="描述">
-            <Input.TextArea rows={4} placeholder="请输入虚拟机描述" />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
+            <Form.Item name="description" label="描述">
+              <Input.TextArea rows={4} placeholder="请输入虚拟机描述" />
+            </Form.Item>
+          </Form>
+        </Modal>
+      </div>
+    </App>
   );
 };
 

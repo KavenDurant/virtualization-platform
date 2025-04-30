@@ -1,36 +1,36 @@
-import React, { useState } from 'react';
 import {
-  Table,
-  Card,
-  Button,
-  Space,
-  Tag,
-  Modal,
-  Form,
-  Input,
-  Select,
-  Switch,
-  Tabs,
-  Badge,
-  Typography,
-  Avatar,
-  Popconfirm,
-  TabsProps,
-} from 'antd';
-import {
-  PlusOutlined,
-  ReloadOutlined,
   DeleteOutlined,
   EditOutlined,
-  UserOutlined,
-  TeamOutlined,
+  EyeInvisibleOutlined,
+  EyeOutlined,
   KeyOutlined,
   LockOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  TeamOutlined,
   UnlockOutlined,
-  EyeOutlined,
-  EyeInvisibleOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
+import {
+  Avatar,
+  Badge,
+  Button,
+  Card,
+  Form,
+  Input,
+  Modal,
+  Popconfirm,
+  Select,
+  Space,
+  Switch,
+  Table,
+  Tabs,
+  TabsProps,
+  Tag,
+  Typography,
+} from 'antd';
 import type { ColumnsType } from 'antd/lib/table';
+import React, { useState } from 'react';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -530,6 +530,7 @@ const Users: React.FC = () => {
             dataSource={userData}
             rowKey="id"
             pagination={{ pageSize: 10 }}
+            scroll={{ x: 'max-content' }}
           />
         </>
       ),
@@ -560,6 +561,7 @@ const Users: React.FC = () => {
             dataSource={groupData}
             rowKey="id"
             pagination={{ pageSize: 10 }}
+            scroll={{ x: 'max-content' }}
           />
         </>
       ),

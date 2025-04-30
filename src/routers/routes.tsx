@@ -6,10 +6,10 @@
  * @FilePath: /virtualization-platform/src/routers/routes.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
+import LazyLoad from '@/components/LazyLoad';
+import MainLayout from '@/layouts/MainLayout';
 import { lazy } from 'react';
 import { Navigate, RouteObject } from 'react-router-dom';
-import MainLayout from '@/layouts/MainLayout';
-import LazyLoad from '@/components/LazyLoad';
 
 // 懒加载页面组件
 const Dashboard = lazy(() => import('@/pages/dashboard'));
@@ -21,6 +21,12 @@ const Settings = lazy(() => import('@/pages/settings'));
 const Login = lazy(() => import('@/pages/login'));
 const NotFound = lazy(() => import('@/pages/404'));
 const ServerError = lazy(() => import('@/pages/500'));
+
+// 集群管理相关页面
+const ClusterMonitoring = lazy(() => import('@/pages/cluster/monitoring'));
+const ClusterFailover = lazy(() => import('@/pages/cluster/failover'));
+const ClusterAlerts = lazy(() => import('@/pages/cluster/alerts'));
+const ClusterConfig = lazy(() => import('@/pages/cluster/config'));
 
 // 路由配置
 const routes: RouteObject[] = [
@@ -51,6 +57,23 @@ const routes: RouteObject[] = [
       {
         path: '/users',
         element: LazyLoad(UserManagement),
+      },
+      // 集群管理路由
+      {
+        path: '/cluster/monitoring',
+        element: LazyLoad(ClusterMonitoring),
+      },
+      {
+        path: '/cluster/failover',
+        element: LazyLoad(ClusterFailover),
+      },
+      {
+        path: '/cluster/alerts',
+        element: LazyLoad(ClusterAlerts),
+      },
+      {
+        path: '/cluster/config',
+        element: LazyLoad(ClusterConfig),
       },
       {
         path: '/settings',

@@ -1,35 +1,35 @@
-import React, { useState } from 'react';
+import NetworkTopology, { NetworkTopologyData } from '@/components/NetworkTopology';
 import {
-  Table,
-  Card,
-  Button,
-  Space,
-  Tag,
-  Modal,
-  Form,
-  Input,
-  Select,
-  InputNumber,
-  Tabs,
-  Badge,
-  Typography,
-  Switch,
-  Divider,
-  Tooltip,
-  message,
-} from 'antd';
-import {
-  PlusOutlined,
-  ReloadOutlined,
+  ApiOutlined,
   DeleteOutlined,
   EditOutlined,
   GlobalOutlined,
-  ApiOutlined,
+  PlusOutlined,
   QuestionCircleOutlined,
+  ReloadOutlined,
 } from '@ant-design/icons';
-import type { ColumnsType } from 'antd/es/table';
 import type { TabsProps } from 'antd';
-import NetworkTopology, { NetworkTopologyData } from '@/components/NetworkTopology';
+import {
+  Badge,
+  Button,
+  Card,
+  Divider,
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  Select,
+  Space,
+  Switch,
+  Table,
+  Tabs,
+  Tag,
+  Tooltip,
+  Typography,
+  message,
+} from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import React, { useState } from 'react';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -634,6 +634,7 @@ const Network: React.FC = () => {
             dataSource={networkData}
             rowKey="id"
             pagination={{ pageSize: 10 }}
+            scroll={{ x: 'max-content' }}
           />
         </>
       ),
@@ -661,6 +662,7 @@ const Network: React.FC = () => {
             dataSource={interfaceData}
             rowKey="id"
             pagination={{ pageSize: 10 }}
+            scroll={{ x: 'max-content' }}
           />
         </>
       ),

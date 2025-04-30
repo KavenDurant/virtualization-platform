@@ -252,3 +252,477 @@ export const getVMAlertThreshold = async (vmId: string): Promise<VMAlertThreshol
     };
   }
 };
+
+// 集群节点数据类型
+export interface ClusterNode {
+  id: string;
+  name: string;
+  ip: string;
+  role: 'master' | 'slave' | 'worker';
+  status: 'online' | 'offline' | 'warning' | 'maintenance';
+  uptime: number; // 运行时间（秒）
+  cpuUsage: number;
+  memoryUsage: number;
+  diskUsage: number;
+  networkUsage: number;
+  services: ServiceStatus[];
+  lastUpdated: number;
+}
+
+// 服务状态类型
+export interface ServiceStatus {
+  name: string;
+  status: 'running' | 'stopped' | 'warning' | 'failed';
+  uptime?: number;
+}
+
+// 集群总体状态
+export interface ClusterStatus {
+  maintenanceNodes: number;
+  id: string;
+  name: string;
+  nodesTotal: number;
+  nodesOnline: number;
+  health: 'healthy' | 'warning' | 'critical';
+  avgLoad: number;
+  timestamp: number;
+  totalNodes?: number; // 可选属性，表示集群中的节点总数
+  faultyNodes?: number; // 可选属性，表示故障节点的数量
+}
+
+// 故障转移策略
+export interface FailoverPolicy {
+  id: string;
+  name: string;
+  enabled: boolean;
+  triggerConditions: {
+    cpuThreshold?: number;
+    memoryThreshold?: number;
+    responseTimeout?: number;
+    serviceFailures?: string[];
+  };
+  actions: ('restart-service' | 'migrate-vm' | 'failover-node' | 'notify')[];
+  priority: number;
+  cooldownPeriod: number; // 冷却期（秒）
+  lastTriggered?: number;
+}
+
+// 告警通知配置
+export interface NotificationConfig {
+  id: string;
+  type: 'email' | 'sms' | 'webhook' | 'app';
+  name: string;
+  enabled: boolean;
+  config: {
+    recipients?: string[];
+    webhookUrl?: string;
+    template?: string;
+  };
+  severityLevels: ('info' | 'warning' | 'error' | 'critical')[];
+}
+
+// 配置备份记录
+export interface ConfigBackup {
+  id: string;
+  name: string;
+  description: string;
+  size: number;
+  createdAt: number;
+  creator: string;
+  status: 'completed' | 'failed' | 'in-progress';
+}
+
+// 获取所有集群节点状态
+export const getClusterNodes = async (): Promise<ClusterNode[]> => {
+  try {
+    const response = await http.get<ClusterNode[]>('/monitoring/cluster/nodes');
+    return response;
+  } catch (error) {
+    console.error('获取集群节点状态失败:', error);
+    message.error('获取集群节点状态失败');
+    // 返回模拟数据以防接口失败
+    return Array(5)
+      .fill(0)
+      .map((_, index) => ({
+        id: `node-${index + 1}`,
+        name: `节点 ${index + 1}`,
+        ip: `192.168.1.${10 + index}`,
+        role:
+          index === 0
+            ? 'master'
+            : ((index < 3 ? 'slave' : 'worker') as 'master' | 'slave' | 'worker'),
+        status:
+          Math.random() > 0.9
+            ? 'warning'
+            : ('online' as 'online' | 'offline' | 'warning' | 'maintenance'),
+        uptime: Math.floor(Math.random() * 30 * 24 * 3600), // 0-30天的随机运行时间
+        cpuUsage: 20 + Math.random() * 60,
+        memoryUsage: 30 + Math.random() * 50,
+        diskUsage: 40 + Math.random() * 40,
+        networkUsage: 10 + Math.random() * 60,
+        services: [
+          {
+            name: 'Hypervisor',
+            status:
+              Math.random() > 0.95
+                ? 'warning'
+                : ('running' as 'running' | 'stopped' | 'warning' | 'failed'),
+            uptime: Math.floor(Math.random() * 30 * 24 * 3600),
+          },
+          {
+            name: 'Network Service',
+            status:
+              Math.random() > 0.95
+                ? 'warning'
+                : ('running' as 'running' | 'stopped' | 'warning' | 'failed'),
+            uptime: Math.floor(Math.random() * 30 * 24 * 3600),
+          },
+          {
+            name: 'Storage Service',
+            status:
+              Math.random() > 0.95
+                ? 'warning'
+                : ('running' as 'running' | 'stopped' | 'warning' | 'failed'),
+            uptime: Math.floor(Math.random() * 30 * 24 * 3600),
+          },
+        ],
+        lastUpdated: Date.now(),
+      }));
+  }
+};
+
+// 获取集群总体状态
+export const getClusterStatus = async (): Promise<ClusterStatus> => {
+  try {
+    const response = await http.get<ClusterStatus>('/monitoring/cluster/status');
+    return response;
+  } catch (error) {
+    console.error('获取集群状态失败:', error);
+    message.error('获取集群状态失败');
+    // 返回模拟数据
+    return {
+      id: 'cluster-1',
+      name: '主生产集群',
+      nodesTotal: 5,
+      nodesOnline: 4,
+      maintenanceNodes: 1,
+      health: Math.random() > 0.9 ? 'warning' : ('healthy' as 'healthy' | 'warning' | 'critical'),
+      avgLoad: 45 + Math.random() * 30,
+      timestamp: Date.now(),
+    };
+  }
+};
+
+// 获取节点详细历史数据
+export const getNodeHistoricalData = async (
+  nodeId: string,
+  metric: string,
+  startTime: number,
+  endTime: number,
+  interval: string = '5m'
+): Promise<{ timestamp: number; value: number }[]> => {
+  try {
+    const response = await http.get<{ timestamp: number; value: number }[]>(
+      `/monitoring/cluster/nodes/${nodeId}/history`,
+      { params: { metric, startTime, endTime, interval } }
+    );
+    return response;
+  } catch (error) {
+    console.error('获取节点历史数据失败:', error);
+    message.error('获取节点历史数据失败');
+    // 返回模拟数据
+    const data: { timestamp: number; value: number }[] = [];
+    const points = 20;
+    const timeSpan = endTime - startTime;
+    const step = timeSpan / points;
+
+    for (let i = 0; i < points; i++) {
+      data.push({
+        timestamp: startTime + i * step,
+        value: 20 + Math.random() * 60,
+      });
+    }
+    return data;
+  }
+};
+
+// 获取故障转移策略列表
+export const getFailoverPolicies = async (): Promise<FailoverPolicy[]> => {
+  try {
+    const response = await http.get<FailoverPolicy[]>('/monitoring/failover/policies');
+    return response;
+  } catch (error) {
+    console.error('获取故障转移策略失败:', error);
+    message.error('获取故障转移策略失败');
+    // 返回模拟数据
+    return [
+      {
+        id: 'policy-1',
+        name: '高可用主服务器故障转移',
+        enabled: true,
+        triggerConditions: {
+          cpuThreshold: 90,
+          memoryThreshold: 95,
+          responseTimeout: 30,
+        },
+        actions: ['restart-service', 'failover-node', 'notify'],
+        priority: 1,
+        cooldownPeriod: 300,
+        lastTriggered: Date.now() - 2 * 24 * 3600 * 1000,
+      },
+      {
+        id: 'policy-2',
+        name: '存储服务故障恢复',
+        enabled: true,
+        triggerConditions: {
+          serviceFailures: ['storage-service'],
+        },
+        actions: ['restart-service', 'notify'],
+        priority: 2,
+        cooldownPeriod: 180,
+      },
+    ];
+  }
+};
+
+// 创建或更新故障转移策略
+export const saveFailoverPolicy = async (policy: FailoverPolicy): Promise<boolean> => {
+  try {
+    if (policy.id) {
+      await http.put(
+        `/monitoring/failover/policies/${policy.id}`,
+        policy as unknown as Record<string, unknown>
+      );
+    } else {
+      await http.post(
+        '/monitoring/failover/policies',
+        policy as unknown as Record<string, unknown>
+      );
+    }
+    message.success('保存故障转移策略成功');
+    return true;
+  } catch (error) {
+    console.error('保存故障转移策略失败:', error);
+    message.error('保存故障转移策略失败');
+    return false;
+  }
+};
+
+// 删除故障转移策略
+export const deleteFailoverPolicy = async (policyId: string): Promise<boolean> => {
+  try {
+    await http.delete(`/monitoring/failover/policies/${policyId}`);
+    message.success('删除故障转移策略成功');
+    return true;
+  } catch (error) {
+    console.error('删除故障转移策略失败:', error);
+    message.error('删除故障转移策略失败');
+    return false;
+  }
+};
+
+// 获取告警通知配置
+export const getNotificationConfigs = async (): Promise<NotificationConfig[]> => {
+  try {
+    const response = await http.get<NotificationConfig[]>('/monitoring/notifications/configs');
+    return response;
+  } catch (error) {
+    console.error('获取告警通知配置失败:', error);
+    message.error('获取告警通知配置失败');
+    // 返回模拟数据
+    return [
+      {
+        id: 'notification-1',
+        type: 'email',
+        name: '管理员邮件通知',
+        enabled: true,
+        config: {
+          recipients: ['admin@example.com', 'ops@example.com'],
+        },
+        severityLevels: ['warning', 'error', 'critical'],
+      },
+      {
+        id: 'notification-2',
+        type: 'webhook',
+        name: '企业微信通知',
+        enabled: true,
+        config: {
+          webhookUrl: 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=abcdef',
+        },
+        severityLevels: ['error', 'critical'],
+      },
+    ];
+  }
+};
+
+// 保存告警通知配置
+export const saveNotificationConfig = async (config: NotificationConfig): Promise<boolean> => {
+  try {
+    if (config.id) {
+      await http.put(
+        `/monitoring/notifications/configs/${config.id}`,
+        config as unknown as Record<string, unknown>
+      );
+    } else {
+      await http.post(
+        '/monitoring/notifications/configs',
+        config as unknown as Record<string, unknown>
+      );
+    }
+    message.success('保存告警通知配置成功');
+    return true;
+  } catch (error) {
+    console.error('保存告警通知配置失败:', error);
+    message.error('保存告警通知配置失败');
+    return false;
+  }
+};
+
+// 删除告警通知配置
+export const deleteNotificationConfig = async (configId: string): Promise<boolean> => {
+  try {
+    await http.delete(`/monitoring/notifications/configs/${configId}`);
+    message.success('删除告警通知配置成功');
+    return true;
+  } catch (error) {
+    console.error('删除告警通知配置失败:', error);
+    message.error('删除告警通知配置失败');
+    return false;
+  }
+};
+
+// 获取配置备份列表
+export const getConfigBackups = async (): Promise<ConfigBackup[]> => {
+  try {
+    const response = await http.get<ConfigBackup[]>('/monitoring/config/backups');
+    return response;
+  } catch (error) {
+    console.error('获取配置备份列表失败:', error);
+    message.error('获取配置备份列表失败');
+    // 返回模拟数据
+    return Array(5)
+      .fill(0)
+      .map((_, index) => ({
+        id: `backup-${index + 1}`,
+        name: `系统配置备份 ${new Date(Date.now() - index * 24 * 3600 * 1000).toLocaleDateString()}`,
+        description: `每日自动备份 #${index + 1}`,
+        size: Math.floor(Math.random() * 10 + 1) * 1024 * 1024, // 1-10MB
+        createdAt: Date.now() - index * 24 * 3600 * 1000,
+        creator: index % 2 === 0 ? '系统自动' : '管理员',
+        status: 'completed' as 'completed' | 'failed' | 'in-progress',
+      }));
+  }
+};
+
+// 创建新的配置备份
+export const createConfigBackup = async (name: string, description: string): Promise<boolean> => {
+  try {
+    await http.post('/monitoring/config/backups', { name, description });
+    message.success('创建配置备份成功');
+    return true;
+  } catch (error) {
+    console.error('创建配置备份失败:', error);
+    message.error('创建配置备份失败');
+    return false;
+  }
+};
+
+// 恢复配置备份
+export const restoreConfigBackup = async (backupId: string): Promise<boolean> => {
+  try {
+    await http.post(`/monitoring/config/backups/${backupId}/restore`);
+    message.success('恢复配置备份成功');
+    return true;
+  } catch (error) {
+    console.error('恢复配置备份失败:', error);
+    message.error('恢复配置备份失败');
+    return false;
+  }
+};
+
+// 删除配置备份
+export const deleteConfigBackup = async (backupId: string): Promise<boolean> => {
+  try {
+    await http.delete(`/monitoring/config/backups/${backupId}`);
+    message.success('删除配置备份成功');
+    return true;
+  } catch (error) {
+    console.error('删除配置备份失败:', error);
+    message.error('删除配置备份失败');
+    return false;
+  }
+};
+
+// 启动实时集群监控 WebSocket 连接
+export const startClusterMonitoring = (
+  onData: (data: ClusterNode[]) => void,
+  onError: (error: Error) => void
+): (() => void) => {
+  // 这里应该使用实际的 WebSocket 连接
+  // 以下是模拟实现
+  const intervalId = setInterval(() => {
+    try {
+      // 模拟实时数据
+      const mockData: ClusterNode[] = Array(5)
+        .fill(0)
+        .map((_, index) => ({
+          id: `node-${index + 1}`,
+          name: `节点 ${index + 1}`,
+          ip: `192.168.1.${10 + index}`,
+          role:
+            index === 0
+              ? 'master'
+              : ((index < 3 ? 'slave' : 'worker') as 'master' | 'slave' | 'worker'),
+          status:
+            Math.random() > 0.9
+              ? 'warning'
+              : ('online' as 'online' | 'offline' | 'warning' | 'maintenance'),
+          uptime: Math.floor(Math.random() * 30 * 24 * 3600), // 0-30天的随机运行时间
+          cpuUsage: 20 + Math.random() * 60,
+          memoryUsage: 30 + Math.random() * 50,
+          diskUsage: 40 + Math.random() * 40,
+          networkUsage: 10 + Math.random() * 60,
+          services: [
+            {
+              name: 'Hypervisor',
+              status:
+                Math.random() > 0.95
+                  ? 'warning'
+                  : ('running' as 'running' | 'stopped' | 'warning' | 'failed'),
+              uptime: Math.floor(Math.random() * 30 * 24 * 3600),
+            },
+            {
+              name: 'Network Service',
+              status:
+                Math.random() > 0.95
+                  ? 'warning'
+                  : ('running' as 'running' | 'stopped' | 'warning' | 'failed'),
+              uptime: Math.floor(Math.random() * 30 * 24 * 3600),
+            },
+            {
+              name: 'Storage Service',
+              status:
+                Math.random() > 0.95
+                  ? 'warning'
+                  : ('running' as 'running' | 'stopped' | 'warning' | 'failed'),
+              uptime: Math.floor(Math.random() * 30 * 24 * 3600),
+            },
+          ],
+          lastUpdated: Date.now(),
+        }));
+
+      // 模拟随机错误
+      if (Math.random() > 0.95) {
+        throw new Error('模拟的网络连接错误');
+      }
+
+      onData(mockData);
+    } catch (error) {
+      // 确保使用错误处理函数
+      onError(error instanceof Error ? error : new Error('未知错误'));
+    }
+  }, 5000); // 每5秒更新一次
+
+  // 返回清理函数
+  return () => clearInterval(intervalId);
+};

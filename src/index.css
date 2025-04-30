@@ -98,25 +98,8 @@ button {
   background-color: #fafafa;
   font-weight: 500;
 }
-
-/* 表格内容行高度设置 */
-.ant-table-tbody > tr > td {
-  height: 48px !important;
-  line-height: 48px !important;
-  padding: 0 16px !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* 确保表格行高度一致 */
-.ant-table-tbody > tr {
-  height: 48px !important;
-}
-
-/* 修正表格内容垂直居中 */
-.ant-table-cell {
-  vertical-align: middle !important;
+.ant-table-tbody .ant-table-row .ant-table-cell {
+  padding: 8px 16px !important;
 }
 
 /* 为符合国保测要求的安全样式 */
