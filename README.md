@@ -922,6 +922,12 @@ src/
 }
 ```
 
+## HTTP Keep-Alive 与 WebSocket 的区别
+
+```
+img [src/assets/image.png]
+```
+
 ## 贡献指南
 
 1. Fork本仓库
