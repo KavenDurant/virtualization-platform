@@ -904,6 +904,24 @@ src/
   └── utils/         # 工具函数
 ```
 
+## 期望后端返回为
+
+```json
+{
+  "code": 0,
+  "msg": "success/error/其他",
+  "loading": true,
+  "data": {
+    "list": [],
+    "pagination": {
+      "total": 100,
+      "pageSize": 10,
+      "current": 1
+    }
+  }
+}
+```
+
 ## 贡献指南
 
 1. Fork本仓库

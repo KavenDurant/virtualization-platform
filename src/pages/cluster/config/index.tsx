@@ -33,6 +33,7 @@ import {
   Typography,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
+import KeepAliveTest from '@/components/KeepAliveTest';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -402,7 +403,10 @@ const ConfigSyncBackup: React.FC = () => {
           />
         </div>
       </Card>
-
+      <Divider orientation="left">测试 Keep-Alive</Divider>
+      <Card title="Keep-Alive 连接测试">
+        <KeepAliveTest />
+      </Card>
       <Modal
         title="创建新备份"
         open={createModalVisible}
