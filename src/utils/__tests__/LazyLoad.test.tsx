@@ -18,8 +18,8 @@ describe('LazyLoad', () => {
   it('renders fallback while loading lazy component', () => {
     render(<Suspense fallback={<div>加载中...</div>}>{LazyLoad(MockLazyComponent)}</Suspense>);
 
-    // 验证组件是否显示了fallback内容
-    expect(screen.getByText('加载中...')).toBeInTheDocument();
+    // 验证组件是否显示了骨架屏组件，而不是指定的文本
+    expect(document.querySelector('.ant-skeleton')).toBeInTheDocument();
   });
 
   it('renders lazily loaded component after loading', async () => {

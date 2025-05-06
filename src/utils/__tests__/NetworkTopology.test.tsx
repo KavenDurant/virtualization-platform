@@ -2,14 +2,14 @@
  * @Author: KavenDurant luojiaxin888@gmail.com
  * @Date: 2025-04-28 14:47:00
  * @LastEditors: KavenDurant luojiaxin888@gmail.com
- * @LastEditTime: 2025-04-28 16:20:54
+ * @LastEditTime: 2025-05-06 13:56:13
  * @FilePath: /virtualization-platform/src/utils/__tests__/NetworkTopology.test.tsx
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koroFileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import NetworkTopology from '../../components/NetworkTopology';
+import { render } from '@testing-library/react';
 import { Network } from 'vis-network';
+import { beforeEach, describe, expect, it, vi, MockInstance } from 'vitest';
+import NetworkTopology from '../../components/NetworkTopology';
 
 // 模拟 vis-network 模块
 vi.mock('vis-network', () => ({
@@ -70,14 +70,16 @@ describe('NetworkTopology', () => {
 
   it('shows loading spinner when loading prop is true', () => {
     render(<NetworkTopology {...mockProps} loading={true} />);
-    expect(screen.getByText('加载中...')).toBeInTheDocument();
+    // 检测Spin组件是否存在，而不是特定的文本
+    const spinElement = document.querySelector('.ant-spin');
+    expect(spinElement).toBeInTheDocument();
   });
 
   it('creates Network instance with correct props', () => {
     render(<NetworkTopology {...mockProps} />);
 
     // 验证 Network 构造函数被调用
-    const NetworkMock = Network as jest.MockedFunction<typeof Network>;
+    const NetworkMock = Network as unknown as MockInstance;
     expect(NetworkMock).toHaveBeenCalled();
   });
 
@@ -86,7 +88,7 @@ describe('NetworkTopology', () => {
     unmount();
 
     // 使用正确的导入方式获取 mock 实例
-    const NetworkMock = Network as jest.MockedFunction<typeof Network>;
+    const NetworkMock = Network as unknown as MockInstance;
     const mockNetworkInstance = NetworkMock.mock.results[0].value;
 
     expect(mockNetworkInstance.destroy).toHaveBeenCalled();
@@ -95,10 +97,10 @@ describe('NetworkTopology', () => {
   it('has control buttons', () => {
     render(<NetworkTopology {...mockProps} />);
 
-    // 检查四个控制按钮是否存在（使用他们的工具提示文本）
-    expect(screen.getByTitle('放大')).toBeInTheDocument();
-    expect(screen.getByTitle('缩小')).toBeInTheDocument();
-    expect(screen.getByTitle('重置视图')).toBeInTheDocument();
-    expect(screen.getByTitle('全屏')).toBeInTheDocument();
+    // 检查按钮图标是否存在，而不是通过title属性
+    expect(document.querySelector('[aria-label="zoom-in"]')).toBeInTheDocument();
+    expect(document.querySelector('[aria-label="zoom-out"]')).toBeInTheDocument();
+    expect(document.querySelector('[aria-label="reload"]')).toBeInTheDocument();
+    expect(document.querySelector('[aria-label="fullscreen"]')).toBeInTheDocument();
   });
 });

@@ -103,14 +103,14 @@ export interface HostPerformanceData {
 export const getHostPerformanceHistory = async (params: {
   metric: string;
   timeRange: string;
-}): Promise<HostPerformanceData[]> => {
+}): Promise<HostPerformanceData[] | null> => {
   try {
     const response = await http.get<HostPerformanceData[]>('/monitoring/history/host', { params });
     return response;
   } catch (error) {
     console.error('获取主机性能历史数据失败:', error);
     message.error('获取主机性能历史数据失败');
-    return [];
+    return null;
   }
 };
 
@@ -118,7 +118,7 @@ export const getHostPerformanceHistory = async (params: {
 export const getVmPerformanceHistory = async (
   vmId: string,
   params: { metric: string; timeRange: string }
-): Promise<VMPerformanceData[]> => {
+): Promise<VMPerformanceData[] | null> => {
   try {
     const response = await http.get<VMPerformanceData[]>(`/monitoring/history/vm/${vmId}`, {
       params,
@@ -127,7 +127,7 @@ export const getVmPerformanceHistory = async (
   } catch (error) {
     console.error('获取虚拟机性能历史数据失败:', error);
     message.error('获取虚拟机性能历史数据失败');
-    return [];
+    return null;
   }
 };
 

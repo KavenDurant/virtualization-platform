@@ -58,7 +58,7 @@ export const getVirtualMachineDetails = async (id: string): Promise<VirtualMachi
     return response;
   } catch (error) {
     console.error('获取虚拟机详细信息失败:', error);
-    message.error('获取虚拟机详细信息失败');
+    message.error('获取虚拟机详情失败');
     return null;
   }
 };
@@ -94,11 +94,10 @@ export const startVirtualMachine = async (id: string): Promise<boolean> => {
   }
 };
 
-// 停止虚拟机（修改为符合测试预期）
+// 停止虚拟机
 export const stopVirtualMachine = async (id: string): Promise<boolean> => {
   try {
-    // 测试期望不带force参数
-    await http.post(`/vm/${id}/stop`, { force: false });
+    await http.post(`/vm/${id}/stop`);
     message.success('停止虚拟机成功');
     return true;
   } catch (error) {
