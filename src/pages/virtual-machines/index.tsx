@@ -1,8 +1,11 @@
 import {
+  CloudUploadOutlined,
   DatabaseOutlined,
   DeleteOutlined,
   DesktopOutlined,
+  DownloadOutlined,
   EditOutlined,
+  ImportOutlined,
   PauseCircleOutlined,
   PlayCircleOutlined,
   PlusOutlined,
@@ -29,11 +32,15 @@ import {
   Tabs,
   Tag,
   message,
+  Upload,
+  notification,
 } from 'antd';
 import type { ColumnsType, TableProps } from 'antd/es/table';
-import React, { useEffect, useState } from 'react';
+import type { RcFile } from 'antd/es/upload';
+import React, { useState } from 'react';
 
 const { Option } = Select;
+const { Dragger } = Upload;
 
 interface VirtualMachine {
   id: string;
@@ -47,45 +54,44 @@ interface VirtualMachine {
   createdAt: string;
 }
 
+// 导入虚拟机的接口定义
+interface ImportVirtualMachine {
+  name: string;
+  os: string;
+  cpu: number;
+  memory: number;
+  storage: number;
+  network: string;
+  description?: string;
+}
+
 const VirtualMachines: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isImportModalVisible, setIsImportModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
+  const [notificationApi, notificationContextHolder] = notification.useNotification();
   // 添加表格大小的状态
-  const [tableSize, setTableSize] = useState<TableProps<VirtualMachine>['size']>('middle');
+  const [tableSize] = useState<TableProps<VirtualMachine>['size']>('middle');
+  // 添加导入相关的状态
+  const [importProgress, setImportProgress] = useState(0);
+  const [importing, setImporting] = useState(false);
+  const [importedCount, setImportedCount] = useState(0);
+  const [totalToImport, setTotalToImport] = useState(0);
+  const [importNotificationKey, setImportNotificationKey] = useState<string | null>(null);
 
-  // 定义行选择配置
-  const rowSelections = {
-    selectedRowKeys,
-    onChange: (selectedKeys: React.Key[]) => {
-      setSelectedRowKeys(selectedKeys);
-    },
+  // 统计数据（实际应用中应该从API获取）
+  const statsData = {
+    totalVMs: 30,
+    runningVMs: 18,
+    stoppedVMs: 7,
+    pausedVMs: 3,
+    errorVMs: 2,
+    totalStorage: 8240, // GB
+    cpuUsage: 57, // 百分比
+    memoryUsage: 64, // 百分比
   };
-
-  // 监听窗口大小变化
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth <= 768) {
-        setTableSize('small'); // 在小屏幕上使用小尺寸
-      } else if (window.innerWidth <= 1200) {
-        setTableSize('middle'); // 在中等屏幕上使用中等尺寸
-      } else {
-        setTableSize('large'); // 在大屏幕上使用大尺寸
-      }
-    };
-
-    // 初始调用一次设置初始值
-    handleResize();
-
-    // 添加窗口大小变化的监听器
-    window.addEventListener('resize', handleResize);
-
-    // 清理函数
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
 
   // 模拟数据
   const data: VirtualMachine[] = [
@@ -111,6 +117,7 @@ const VirtualMachines: React.FC = () => {
       ip: '192.168.1.102',
       createdAt: '2023-04-10 11:20:15',
     },
+    // ... 可以添加更多虚拟机数据
     {
       id: '3',
       name: '测试服务器-01',
@@ -144,299 +151,34 @@ const VirtualMachines: React.FC = () => {
       ip: '192.168.1.105',
       createdAt: '2023-02-15 08:30:45',
     },
-    {
-      id: '6',
-      name: 'Web服务器-02',
-      status: 'running',
-      os: 'CentOS 8',
-      cpu: 2,
-      memory: 4,
-      storage: 50,
-      ip: '192.168.1.106',
-      createdAt: '2023-04-18 08:45:00',
-    },
-    {
-      id: '7',
-      name: '数据库服务器-02',
-      status: 'stopped',
-      os: 'Ubuntu 20.04',
-      cpu: 8,
-      memory: 16,
-      storage: 300,
-      ip: '192.168.1.107',
-      createdAt: '2023-04-05 14:30:20',
-    },
-    {
-      id: '8',
-      name: '测试服务器-02',
-      status: 'running',
-      os: 'Windows Server 2022',
-      cpu: 4,
-      memory: 8,
-      storage: 150,
-      ip: '192.168.1.108',
-      createdAt: '2023-04-02 16:25:10',
-    },
-    {
-      id: '9',
-      name: '开发服务器-02',
-      status: 'error',
-      os: 'Debian 11',
-      cpu: 4,
-      memory: 8,
-      storage: 120,
-      ip: '192.168.1.109',
-      createdAt: '2023-03-18 09:15:30',
-    },
-    {
-      id: '10',
-      name: '应用服务器-01',
-      status: 'running',
-      os: 'RedHat 8',
-      cpu: 4,
-      memory: 8,
-      storage: 200,
-      ip: '192.168.1.110',
-      createdAt: '2023-03-15 11:40:00',
-    },
-    {
-      id: '11',
-      name: 'Web服务器-03',
-      status: 'paused',
-      os: 'CentOS 8',
-      cpu: 2,
-      memory: 4,
-      storage: 80,
-      ip: '192.168.1.111',
-      createdAt: '2023-03-12 13:20:45',
-    },
-    {
-      id: '12',
-      name: '文件服务器-01',
-      status: 'running',
-      os: 'Ubuntu 18.04',
-      cpu: 2,
-      memory: 4,
-      storage: 2000,
-      ip: '192.168.1.112',
-      createdAt: '2023-03-08 10:15:30',
-    },
-    {
-      id: '13',
-      name: '监控服务器-01',
-      status: 'running',
-      os: 'CentOS 8',
-      cpu: 4,
-      memory: 8,
-      storage: 120,
-      ip: '192.168.1.113',
-      createdAt: '2023-03-05 08:45:15',
-    },
-    {
-      id: '14',
-      name: '邮件服务器-01',
-      status: 'stopped',
-      os: 'Debian 10',
-      cpu: 2,
-      memory: 4,
-      storage: 100,
-      ip: '192.168.1.114',
-      createdAt: '2023-03-01 16:30:00',
-    },
-    {
-      id: '15',
-      name: '日志服务器-01',
-      status: 'running',
-      os: 'Ubuntu 20.04',
-      cpu: 4,
-      memory: 8,
-      storage: 500,
-      ip: '192.168.1.115',
-      createdAt: '2023-02-25 14:20:10',
-    },
-    {
-      id: '16',
-      name: 'Docker主机-01',
-      status: 'running',
-      os: 'Ubuntu 20.04',
-      cpu: 8,
-      memory: 16,
-      storage: 300,
-      ip: '192.168.1.116',
-      createdAt: '2023-02-20 09:10:05',
-    },
-    {
-      id: '17',
-      name: 'Kubernetes节点-01',
-      status: 'running',
-      os: 'CentOS 8',
-      cpu: 4,
-      memory: 8,
-      storage: 200,
-      ip: '192.168.1.117',
-      createdAt: '2023-02-18 11:25:30',
-    },
-    {
-      id: '18',
-      name: 'Kubernetes节点-02',
-      status: 'running',
-      os: 'CentOS 8',
-      cpu: 4,
-      memory: 8,
-      storage: 200,
-      ip: '192.168.1.118',
-      createdAt: '2023-02-18 11:30:45',
-    },
-    {
-      id: '19',
-      name: 'Kubernetes节点-03',
-      status: 'error',
-      os: 'CentOS 8',
-      cpu: 4,
-      memory: 8,
-      storage: 200,
-      ip: '192.168.1.119',
-      createdAt: '2023-02-18 11:35:50',
-    },
-    {
-      id: '20',
-      name: 'Jenkins服务器-01',
-      status: 'running',
-      os: 'Ubuntu 20.04',
-      cpu: 4,
-      memory: 8,
-      storage: 150,
-      ip: '192.168.1.120',
-      createdAt: '2023-02-15 14:40:25',
-    },
-    {
-      id: '21',
-      name: 'GitLab服务器-01',
-      status: 'running',
-      os: 'Ubuntu 20.04',
-      cpu: 4,
-      memory: 8,
-      storage: 200,
-      ip: '192.168.1.121',
-      createdAt: '2023-02-10 13:15:30',
-    },
-    {
-      id: '22',
-      name: '内网DNS服务器-01',
-      status: 'running',
-      os: 'CentOS 8',
-      cpu: 2,
-      memory: 4,
-      storage: 50,
-      ip: '192.168.1.122',
-      createdAt: '2023-02-05 10:20:15',
-    },
-    {
-      id: '23',
-      name: 'VPN服务器-01',
-      status: 'paused',
-      os: 'Ubuntu 20.04',
-      cpu: 2,
-      memory: 4,
-      storage: 50,
-      ip: '192.168.1.123',
-      createdAt: '2023-02-01 09:45:00',
-    },
-    {
-      id: '24',
-      name: '代理服务器-01',
-      status: 'running',
-      os: 'Debian 11',
-      cpu: 2,
-      memory: 4,
-      storage: 80,
-      ip: '192.168.1.124',
-      createdAt: '2023-01-28 16:30:20',
-    },
-    {
-      id: '25',
-      name: '缓存服务器-01',
-      status: 'running',
-      os: 'Redis OS',
-      cpu: 4,
-      memory: 16,
-      storage: 100,
-      ip: '192.168.1.125',
-      createdAt: '2023-01-25 14:15:10',
-    },
-    {
-      id: '26',
-      name: '负载均衡器-01',
-      status: 'running',
-      os: 'NGINX OS',
-      cpu: 2,
-      memory: 4,
-      storage: 50,
-      ip: '192.168.1.126',
-      createdAt: '2023-01-20 11:10:30',
-    },
-    {
-      id: '27',
-      name: '负载均衡器-02',
-      status: 'stopped',
-      os: 'NGINX OS',
-      cpu: 2,
-      memory: 4,
-      storage: 50,
-      ip: '192.168.1.127',
-      createdAt: '2023-01-20 11:20:45',
-    },
-    {
-      id: '28',
-      name: '防火墙-01',
-      status: 'running',
-      os: 'OPNsense',
-      cpu: 2,
-      memory: 4,
-      storage: 40,
-      ip: '192.168.1.128',
-      createdAt: '2023-01-15 09:30:15',
-    },
-    {
-      id: '29',
-      name: '数据分析服务器-01',
-      status: 'running',
-      os: 'Ubuntu 20.04',
-      cpu: 16,
-      memory: 64,
-      storage: 1000,
-      ip: '192.168.1.129',
-      createdAt: '2023-01-10 08:25:30',
-    },
-    {
-      id: '30',
-      name: '人工智能训练服务器-01',
-      status: 'paused',
-      os: 'Ubuntu 20.04',
-      cpu: 32,
-      memory: 128,
-      storage: 2000,
-      ip: '192.168.1.130',
-      createdAt: '2023-01-05 10:15:45',
-    },
   ];
 
-  // 统计数据（实际应用中应该从API获取）
-  const statsData = {
-    totalVMs: 30,
-    runningVMs: 18,
-    stoppedVMs: 7,
-    pausedVMs: 3,
-    errorVMs: 2,
-    totalStorage: 8240, // GB
-    cpuUsage: 57, // 百分比
-    memoryUsage: 64, // 百分比
+  // 定义行选择配置
+  const rowSelections = {
+    selectedRowKeys,
+    onChange: (selectedKeys: React.Key[]) => {
+      setSelectedRowKeys(selectedKeys);
+    },
+  };
+
+  // 显示导入模态框
+  const showImportModal = () => {
+    setIsImportModalVisible(true);
+  };
+
+  // 关闭导入模态框
+  const handleImportCancel = () => {
+    setIsImportModalVisible(false);
+    // 如果正在导入，不应该直接关闭
+    if (!importing) {
+      // 重置导入相关状态
+      setImportProgress(0);
+      setImportedCount(0);
+      setTotalToImport(0);
+    }
   };
 
   const showModal = () => {
-    messageApi.success({
-      content: '创建虚拟机成功',
-    });
     setIsModalVisible(true);
   };
 
@@ -667,6 +409,9 @@ const VirtualMachines: React.FC = () => {
               <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
                 创建虚拟机
               </Button>
+              <Button icon={<ImportOutlined />} onClick={showImportModal}>
+                导入虚拟机
+              </Button>
               <Button icon={<ReloadOutlined />}>刷新</Button>
             </Space>
           </div>
@@ -696,10 +441,236 @@ const VirtualMachines: React.FC = () => {
     },
   ];
 
+  // 处理文件上传前的校验
+  const beforeUpload = (file: RcFile) => {
+    const isJson = file.type === 'application/json';
+    const isCsv = file.type === 'text/csv';
+
+    if (!isJson && !isCsv) {
+      messageApi.error('仅支持上传JSON或CSV文件!');
+      return false;
+    }
+    return true;
+  };
+
+  // 下载导入模板
+  const downloadTemplate = () => {
+    const template = [
+      {
+        name: '虚拟机示例-01',
+        os: 'CentOS 8',
+        cpu: 2,
+        memory: 4,
+        storage: 50,
+        network: 'default',
+        description: '示例虚拟机描述',
+      },
+      {
+        name: '虚拟机示例-02',
+        os: 'Ubuntu 20.04',
+        cpu: 4,
+        memory: 8,
+        storage: 100,
+        network: 'isolated',
+        description: '示例虚拟机描述',
+      },
+      {
+        name: '虚拟机示例-03',
+        os: 'CentOS 03',
+        cpu: 3,
+        memory: 34,
+        storage: 67,
+        network: 'default',
+        description: '示例虚拟机描述',
+      },
+      {
+        name: '虚拟机示例-04',
+        os: 'Ubuntu 20.04',
+        cpu: 12,
+        memory: 64,
+        storage: 84,
+        network: 'isolated',
+      },
+    ];
+
+    const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = '虚拟机导入模板.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // CSV解析为虚拟机数组
+  const parseCsvToVirtualMachines = (csvContent: string): ImportVirtualMachine[] => {
+    // 简单的CSV解析逻辑，实际应用中可以使用专业库如Papa Parse
+    const lines = csvContent.split('\n');
+    const headers = lines[0].split(',');
+
+    return lines
+      .slice(1)
+      .filter(line => line.trim() !== '')
+      .map(line => {
+        const values = line.split(',');
+        const vm = {};
+
+        headers.forEach((header, index) => {
+          const value = values[index]?.trim();
+          if (header === 'cpu' || header === 'memory' || header === 'storage') {
+            vm[header] = parseFloat(value);
+          } else {
+            vm[header] = value;
+          }
+        });
+
+        return vm as ImportVirtualMachine;
+      });
+  };
+
+  // 处理导入虚拟机
+  const handleImport = async options => {
+    const { file, onProgress, onSuccess, onError } = options;
+
+    try {
+      setImporting(true);
+
+      // 显示通知，这里使用key以便后续可以更新同一个通知
+      const notificationKey = `import-${Date.now()}`;
+      setImportNotificationKey(notificationKey);
+
+      notificationApi.open({
+        key: notificationKey,
+        message: '导入虚拟机正在执行中',
+        description: <Progress percent={0} />,
+        duration: 0,
+        icon: <CloudUploadOutlined style={{ color: '#1890ff' }} />,
+      });
+
+      // 读取文件内容
+      const reader = new FileReader();
+      reader.readAsText(file);
+      reader.onload = async e => {
+        try {
+          let vmList: ImportVirtualMachine[] = [];
+
+          if (file.type === 'application/json') {
+            vmList = JSON.parse(e.target?.result as string);
+          } else if (file.type === 'text/csv') {
+            vmList = parseCsvToVirtualMachines(e.target?.result as string);
+          }
+
+          setTotalToImport(vmList.length);
+
+          // 模拟导入进度
+          // 实际应用中这里应该调用后端API进行批量导入
+          for (let i = 0; i < vmList.length; i++) {
+            // 模拟API调用延迟
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // 更新进度
+            const currentProgress = Math.round(((i + 1) / vmList.length) * 100);
+            setImportProgress(currentProgress);
+            setImportedCount(i + 1);
+
+            // 更新通知中的进度条
+            notificationApi.open({
+              key: notificationKey,
+              message: '导入虚拟机正在执行中',
+              description: (
+                <>
+                  <Progress percent={currentProgress} />
+                  <div>
+                    已完成: {i + 1}/{vmList.length}
+                  </div>
+                </>
+              ),
+              duration: 0,
+              icon: <CloudUploadOutlined style={{ color: '#1890ff' }} />,
+            });
+
+            onProgress({ percent: currentProgress });
+          }
+
+          // 导入完成
+          onSuccess('导入成功');
+          messageApi.success(`成功导入 ${vmList.length} 台虚拟机`);
+
+          // 更新通知为成功状态
+          notificationApi.open({
+            key: notificationKey,
+            message: '导入虚拟机完成',
+            description: (
+              <>
+                <Progress percent={100} status="success" />
+                <div>
+                  已成功导入: {vmList.length}/{vmList.length}
+                </div>
+              </>
+            ),
+            duration: 5,
+            icon: <CloudUploadOutlined style={{ color: '#52c41a' }} />,
+          });
+
+          // 刷新数据（实际应用中应该调用API获取最新数据）
+          // fetchVirtualMachines();
+
+          // 关闭导入模态框
+          setIsImportModalVisible(false);
+        } catch (error) {
+          console.error('解析文件失败:', error);
+          onError({ event: error });
+          messageApi.error('解析文件失败');
+
+          // 更新通知为错误状态
+          notificationApi.open({
+            key: notificationKey,
+            message: '导入虚拟机失败',
+            description: '解析文件失败，请检查文件格式是否正确',
+            duration: 5,
+            icon: <CloudUploadOutlined style={{ color: '#ff4d4f' }} />,
+          });
+        }
+      };
+
+      reader.onerror = error => {
+        onError({ event: error });
+        messageApi.error('读取文件失败');
+
+        notificationApi.open({
+          key: notificationKey,
+          message: '导入虚拟机失败',
+          description: '读取文件失败，请重试',
+          duration: 5,
+          icon: <CloudUploadOutlined style={{ color: '#ff4d4f' }} />,
+        });
+      };
+    } catch (error) {
+      console.error('导入过程中出错:', error);
+      onError({ event: error });
+      messageApi.error('导入过程中出错');
+
+      if (importNotificationKey) {
+        notificationApi.open({
+          key: importNotificationKey,
+          message: '导入虚拟机失败',
+          description: '导入过程中出错，请重试',
+          duration: 5,
+          icon: <CloudUploadOutlined style={{ color: '#ff4d4f' }} />,
+        });
+      }
+    } finally {
+      setImporting(false);
+    }
+  };
+
   return (
     <App>
       <div className="virtual-machines-container">
         {contextHolder}
+        {notificationContextHolder}
         <Card>
           <Tabs defaultActiveKey="1" items={tabItems} />
         </Card>
@@ -792,6 +763,55 @@ const VirtualMachines: React.FC = () => {
               <Input.TextArea rows={4} placeholder="请输入虚拟机描述" />
             </Form.Item>
           </Form>
+        </Modal>
+
+        {/* 导入虚拟机模态框 */}
+        <Modal
+          title="导入虚拟机"
+          open={isImportModalVisible}
+          onCancel={handleImportCancel}
+          footer={null}
+          width={550}
+          style={{ maxWidth: '100vw', margin: 0 }}
+          centered
+        >
+          <div style={{ textAlign: 'center', padding: '20px 0' }}>
+            <p style={{ marginBottom: 20 }}>支持以JSON或CSV格式批量导入虚拟机</p>
+
+            <Dragger
+              name="file"
+              multiple={false}
+              customRequest={handleImport}
+              beforeUpload={beforeUpload}
+              showUploadList={false}
+              disabled={importing}
+              accept=".json,.csv"
+              style={{ padding: '20px 0' }}
+            >
+              <p className="ant-upload-drag-icon">
+                <CloudUploadOutlined style={{ fontSize: 48, color: '#1890ff' }} />
+              </p>
+              <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
+              <p className="ant-upload-hint">支持JSON或CSV格式的虚拟机配置文件</p>
+            </Dragger>
+
+            <div style={{ marginTop: 15 }}>
+              <Button type="link" onClick={downloadTemplate} icon={<DownloadOutlined />}>
+                下载导入模板
+              </Button>
+            </div>
+
+            {importing && (
+              <div style={{ marginTop: 20 }}>
+                <Progress
+                  percent={importProgress}
+                  status="active"
+                  format={() => `${importedCount}/${totalToImport}`}
+                />
+                <div style={{ marginTop: 10 }}>正在导入中，请勿关闭窗口...</div>
+              </div>
+            )}
+          </div>
         </Modal>
       </div>
     </App>
