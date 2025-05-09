@@ -162,7 +162,7 @@ const NetworkTopology: React.FC<NetworkTopologyProps> = ({
           enabled: true, // 启用稳定化
           iterations: 1000, // 最大迭代次数
           updateInterval: 100, // 更新间隔
-          onlyDynamicEdges: false, // 是否只稳定动态边
+          onlyDynamicEdges: false, // 禁用动态边晃动
           fit: true, // 稳定后调整视图以适应所有节点
         },
         solver: 'barnesHut', // 明确指定使用barnesHut求解器

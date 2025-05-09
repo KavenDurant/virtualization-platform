@@ -2,7 +2,7 @@
  * @Author: KavenDurant luojiaxin888@gmail.com
  * @Date: 2025-04-27 09:06:01
  * @LastEditors: KavenDurant luojiaxin888@gmail.com
- * @LastEditTime: 2025-04-28 11:38:38
+ * @LastEditTime: 2025-05-07 14:30:00
  * @FilePath: /virtualization-platform/src/routers/routes.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -27,6 +27,8 @@ const ClusterMonitoring = lazy(() => import('@/pages/cluster/monitoring'));
 const ClusterFailover = lazy(() => import('@/pages/cluster/failover'));
 const ClusterAlerts = lazy(() => import('@/pages/cluster/alerts'));
 const ClusterConfig = lazy(() => import('@/pages/cluster/config'));
+// 备份详情页面
+const BackupDetail = lazy(() => import('@/pages/cluster/config/detail'));
 
 // 路由配置
 const routes: RouteObject[] = [
@@ -74,6 +76,11 @@ const routes: RouteObject[] = [
       {
         path: '/cluster/config',
         element: LazyLoad(ClusterConfig),
+      },
+      // 添加备份详情页路由
+      {
+        path: '/cluster/config/:backupId',
+        element: LazyLoad(BackupDetail),
       },
       {
         path: '/settings',

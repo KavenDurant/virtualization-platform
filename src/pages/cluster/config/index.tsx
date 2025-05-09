@@ -1,3 +1,4 @@
+import KeepAliveTest from '@/components/KeepAliveTest';
 import {
   ConfigBackup,
   createConfigBackup,
@@ -33,7 +34,7 @@ import {
   Typography,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
-import KeepAliveTest from '@/components/KeepAliveTest';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -50,8 +51,8 @@ interface CreateBackupValues {
   name: string;
   description?: string;
 }
-
 const ConfigSyncBackup: React.FC = () => {
+  const navigate = useNavigate();
   const [backups, setBackups] = useState<ConfigBackup[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [creating, setCreating] = useState<boolean>(false);
@@ -128,7 +129,11 @@ const ConfigSyncBackup: React.FC = () => {
       clearInterval(interval);
     }
   };
-
+  const handleViewInfo = (backupId: string) => {
+    console.log('查看备份详情:', backupId);
+    // 路由跳转到详情页面
+    navigate(`/cluster/config/${backupId}`);
+  };
   // 删除备份
   const handleDeleteBackup = async (backupId: string) => {
     try {
@@ -253,7 +258,7 @@ const ConfigSyncBackup: React.FC = () => {
             type="text"
             size="small"
             icon={<HistoryOutlined />}
-            onClick={() => console.log('查看详情', record)}
+            onClick={() => handleViewInfo(record.id)}
           >
             详情
           </Button>

@@ -603,7 +603,7 @@ export const getConfigBackups = async (): Promise<ConfigBackup[]> => {
     return Array(5)
       .fill(0)
       .map((_, index) => ({
-        id: `backup-${index + 1}`,
+        id: `backup-${Math.floor(Math.random() * 1000)}`, //取整
         name: `系统配置备份 ${new Date(Date.now() - index * 24 * 3600 * 1000).toLocaleDateString()}`,
         description: `每日自动备份 #${index + 1}`,
         size: Math.floor(Math.random() * 10 + 1) * 1024 * 1024, // 1-10MB
@@ -650,6 +650,96 @@ export const deleteConfigBackup = async (backupId: string): Promise<boolean> => 
     console.error('删除配置备份失败:', error);
     message.error('删除配置备份失败');
     return false;
+  }
+};
+
+/**
+ * 获取配置备份详情
+ * @param backupId 备份ID
+ * @returns 备份详情数据
+ */
+export const getConfigBackupDetail = async (backupId: string) => {
+  try {
+    // const response = await http.get<any>(`/api/config/backups/${backupId}`);
+    // return response;
+
+    // 模拟数据，实际项目中应使用上面的API调用
+    await new Promise(resolve => setTimeout(resolve, 800)); // 模拟网络延迟
+
+    return {
+      id: backupId,
+      name: `系统配置备份 #${backupId.slice(0, 5)}`,
+      description:
+        '此备份包含了完整的系统配置信息，包括网络设置、存储配置、安全策略和用户权限等核心数据。',
+      size: 15728640, // 15MB
+      creator: '系统管理员',
+      createdAt: Date.now() - 86400000 * 2, // 2天前
+      status: 'completed',
+      fileCount: 128,
+      backupType: '完整备份',
+      tags: ['系统配置', '定期备份', '高优先级'],
+      history: [
+        {
+          time: Date.now() - 86400000 * 2,
+          action: '创建备份',
+          user: '系统管理员',
+          details: '初始创建完整系统配置备份',
+        },
+        {
+          time: Date.now() - 86400000 * 2 + 3600000,
+          action: '验证备份',
+          user: '系统',
+          details: '自动完成备份完整性验证',
+        },
+        {
+          time: Date.now() - 86400000,
+          action: '下载备份',
+          user: '运维人员',
+          details: '备份文件已下载用于存档',
+        },
+      ],
+      changedFiles: [
+        {
+          path: '/etc/network/interfaces',
+          type: '配置文件',
+          changeType: 'modified',
+          size: 2048,
+        },
+        {
+          path: '/etc/hosts',
+          type: '配置文件',
+          changeType: 'modified',
+          size: 1024,
+        },
+        {
+          path: '/etc/security/access.conf',
+          type: '安全配置',
+          changeType: 'added',
+          size: 4096,
+        },
+        {
+          path: '/var/lib/libvirt/images/vm1.qcow2',
+          type: '虚拟机镜像',
+          changeType: 'modified',
+          size: 10485760,
+        },
+        {
+          path: '/etc/deprecated/old-config.xml',
+          type: '配置文件',
+          changeType: 'deleted',
+          size: 0,
+        },
+      ],
+      systemInfo: {
+        platformVersion: 'v2.5.3',
+        nodesCount: 4,
+        backupTime: 12500, // 毫秒
+        compressionRatio: 3.2,
+      },
+    };
+  } catch (error) {
+    console.error('获取备份详情失败:', error);
+    throw error;
   }
 };
 
