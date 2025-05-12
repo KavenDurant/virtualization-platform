@@ -30,10 +30,9 @@
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.5.2",
+    "reactflow": "^11.11.4",
     "redux": "^5.0.1",
-    "redux-persist": "^6.0.0",
-    "vis-data": "^7.1.9",
-    "vis-network": "^9.1.9"
+    "redux-persist": "^6.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",

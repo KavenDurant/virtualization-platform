@@ -25,8 +25,23 @@ import '../styles/layout.less';
 
 const { Header, Sider, Content } = Layout;
 
+// 本地存储的键名
+const SIDEBAR_COLLAPSED_KEY = 'sidebar_collapsed';
+const MENU_OPEN_KEYS_KEY = 'menu_open_keys';
+
 const MainLayout: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  // 从本地存储中获取初始状态
+  const [collapsed, setCollapsed] = useState(() => {
+    const savedState = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+    return savedState ? JSON.parse(savedState) : false;
+  });
+
+  // 从本地存储中获取菜单展开状态
+  const [openKeys, setOpenKeys] = useState<string[]>(() => {
+    const savedKeys = localStorage.getItem(MENU_OPEN_KEYS_KEY);
+    return savedKeys ? JSON.parse(savedKeys) : [];
+  });
+
   const [isMobile, setIsMobile] = useState(false);
   const [isSmall, setIsSmall] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -57,6 +72,21 @@ const MainLayout: React.FC = () => {
       window.removeEventListener('resize', checkScreenSize);
     };
   }, []);
+
+  // 当 collapsed 状态改变时，保存到本地存储
+  useEffect(() => {
+    localStorage.setItem(SIDEBAR_COLLAPSED_KEY, JSON.stringify(collapsed));
+  }, [collapsed]);
+
+  // 当 openKeys 状态改变时，保存到本地存储
+  useEffect(() => {
+    localStorage.setItem(MENU_OPEN_KEYS_KEY, JSON.stringify(openKeys));
+  }, [openKeys]);
+
+  // 处理菜单展开/收起
+  const handleOpenChange = (keys: string[]) => {
+    setOpenKeys(keys);
+  };
 
   // 菜单项配置
   const menuItems = [
@@ -261,6 +291,8 @@ const MainLayout: React.FC = () => {
             mode="inline"
             defaultSelectedKeys={[location.pathname]}
             selectedKeys={[location.pathname]}
+            openKeys={openKeys}
+            onOpenChange={handleOpenChange}
             items={menuItems}
             onClick={e => {
               handleMenuClick(e);
@@ -365,6 +397,8 @@ const MainLayout: React.FC = () => {
             mode="inline"
             defaultSelectedKeys={[location.pathname]}
             selectedKeys={[location.pathname]}
+            openKeys={openKeys}
+            onOpenChange={handleOpenChange}
             items={menuItems}
             onClick={e => {
               handleMenuClick(e);

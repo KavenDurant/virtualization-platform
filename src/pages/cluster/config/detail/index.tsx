@@ -83,7 +83,7 @@ const BackupDetail: React.FC = () => {
       try {
         setLoading(true);
         // 调用API获取备份详情
-        const data = await getConfigBackupDetail(backupId);
+        const data = (await getConfigBackupDetail(backupId)) as BackupDetail;
         setBackupDetail(data);
 
         // 更新面包屑导航
